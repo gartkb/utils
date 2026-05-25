@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <link rel="icon" type="image/svg+xml" href="hydrotrack.svg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroTrack - Tomato Smart Advisor</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b',
+                        borderBg: '#334155',
+                        rainPast: '#3b82f6',
+                        rainForecast: '#f97316',
+                        soilMoisture: '#10b981',
+                        watered: '#06b6d4',
+                        tempColor: '#ef4444',
+                        targetWater: '#ef4444'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+
+<body class="bg-darkBg text-slate-100 min-h-screen font-sans antialiased">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-600 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-seedling text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight flex items-center gap-2">
+                        HydroTrack <span
+                            class="text-xs bg-emerald-500/20 text-emerald-400 font-semibold px-2 py-0.5 rounded">Predictive
+                            Tomato Edition</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Microclimate-adjusted Irrigation Assistant</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                <button onclick="toggleSettings()"
+                    class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-sm transition-all">
+                    <i class="fa-solid fa-sliders text-slate-400"></i>
+                    <span>App Settings</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-4 lg:p-6">
+
+        <!-- Settings drawer (API keys and Soil profiles) -->
+        <div id="settings-panel" class="hidden mb-6 bg-slate-800/90 border border-slate-700 rounded-xl p-5 shadow-xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Left: Geoapify API Key -->
+                <div>
+                    <h3 class="text-sm font-semibold mb-2 text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-key text-yellow-500"></i> Geoapify Configuration
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-3">
+                        Required to search locations by postal code or address. Paste your key from <a
+                            href="https://myprojects.geoapify.com/" target="_blank"
+                            class="text-blue-400 underline hover:text-blue-300">geoapify.com</a>.
+                    </p>
+                    <div class="flex gap-2">
+                        <input type="password" id="api-key-input" placeholder="Paste Geoapify API Key..."
+                            class="flex-grow bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-200">
+                        <button onclick="saveApiKey()"
+                            class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-all">Save
+                            Key</button>
+                    </div>
+                    <div id="api-key-status" class="mt-2 text-[11px]"></div>
+                </div>
+
+                <!-- Right: Soil and Microclimate Configuration -->
+                <div>
+                    <h3 class="text-sm font-semibold mb-2 text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-layer-group text-emerald-500"></i> Soil & Plant Calibration Profile
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-3">
+                        Adjusts the critical soil moisture threshold based on your raised-bed and mulching
+                        configuration.
+                    </p>
+                    <div class="space-y-3">
+                        <div>
+                            <label for="soil-profile-select" class="block text-xs text-slate-400 mb-1">Microclimate
+                                Profile</label>
+                            <select id="soil-profile-select" onchange="changeSoilProfile(this.value)"
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 text-slate-200">
+                                <option value="standard">Standard Soil / Bare Surface (Threshold: 0.18 m³/m³)</option>
+                                <option value="mulched" selected>Raised Bed + Cardboard Mulch & Deep Roots (Threshold:
+                                    0.12 m³/m³)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+            <!-- Sidebar Navigation -->
+            <section class="lg:col-span-1 flex flex-col gap-6">
+
+                <!-- Search -->
+                <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg">
+                    <h2
+                        class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-magnifying-glass-location text-blue-400"></i> Location Lookup
+                    </h2>
+
+                    <form onsubmit="handleSearchSubmit(event)" class="flex flex-col gap-3">
+                        <input type="text" id="location-query" placeholder="Canadian Postal Code, Address or Lat,Lon"
+                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="submit"
+                                class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-magnifying-glass"></i> Search
+                            </button>
+                            <button type="button" onclick="getCurrentGPS()"
+                                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all">
+                                <i class="fa-solid fa-location-crosshairs text-teal-400"></i> Use GPS
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Saved Locations -->
+                <div
+                    class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg flex-grow flex flex-col min-h-[220px]">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2
+                            class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                            <i class="fa-solid fa-star text-yellow-500"></i> Saved Beds
+                        </h2>
+                        <button id="favorite-current-btn" onclick="toggleCurrentFavorite()"
+                            class="hidden text-xs text-blue-400 hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Save Active
+                        </button>
+                    </div>
+
+                    <div id="favorites-list" class="space-y-2 overflow-y-auto max-h-[300px] flex-grow pr-1">
+                        <div class="text-center py-8 text-slate-500 text-xs">
+                            No saved locations.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Dashboard Pane -->
+            <section class="lg:col-span-3 flex flex-col gap-6">
+
+                <!-- Alert Box -->
+                <div id="alert-box"
+                    class="hidden bg-red-900/40 border border-red-700 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span id="alert-message">Error</span>
+                    </div>
+                    <button onclick="hideAlert()" class="text-red-200 hover:text-white"><i
+                            class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- Empty State Fallback -->
+                <div id="empty-dashboard-state"
+                    class="bg-cardBg border border-borderBg rounded-2xl p-12 text-center shadow-lg my-auto">
+                    <i class="fa-solid fa-temperature-empty text-5xl text-slate-600 mb-4 animate-bounce"></i>
+                    <h2 class="text-lg font-bold mb-1">Enter Raised Bed Location</h2>
+                    <p class="text-slate-400 max-w-sm mx-auto text-xs mb-6">
+                        Enter a location or postal code to load weather forecasts, ground moisture conditions, and
+                        customized tomato irrigation schedules.
+                    </p>
+                    <button onclick="loadSampleLocation()"
+                        class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-lg text-xs font-semibold transition-all">
+                        Load Vancouver Demo (Raised Bed)
+                    </button>
+                </div>
+
+                <!-- Active Dashboard View -->
+                <div id="active-dashboard" class="hidden space-y-6">
+
+                    <!-- Dashboard Title Banner -->
+                    <div
+                        class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active
+                                Monitoring Station</span>
+                            <h2 id="active-location-title" class="text-lg font-bold text-white mt-0.5">Surrey, BC</h2>
+                            <p id="active-location-coords" class="text-xs text-slate-400">Lat: 49.104, Lon: -122.801</p>
+                        </div>
+                        <div class="flex items-center gap-2 self-stretch md:self-auto justify-end">
+                            <button onclick="refreshCurrentLocation()"
+                                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-lg text-slate-300 transition-all"
+                                title="Force Refresh">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- WATERING ADVISOR INTELLIGENT CARD -->
+                    <div id="advisor-card" class="border rounded-2xl p-6 shadow-xl transition-all">
+                        <div class="flex items-start gap-4">
+                            <div id="advisor-icon-wrapper"
+                                class="p-3.5 rounded-xl text-white flex items-center justify-center">
+                                <i id="advisor-icon" class="fa-solid text-2xl"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <h3 class="font-bold text-base text-white">Tomato Watering Advisor</h3>
+                                    <span id="advisor-status-badge"
+                                        class="text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Loading...</span>
+                                </div>
+                                <p id="advisor-description" class="text-sm mt-2 text-slate-300 leading-relaxed">
+                                    Analyzing weather conditions and local metrics to generate irrigation guidance.
+                                </p>
+                                <!-- Predictor Line -->
+                                <div id="advisor-prediction-line"
+                                    class="mt-3 pt-3 border-t border-slate-700/50 flex items-center gap-2 text-xs font-semibold text-slate-300">
+                                    <i class="fa-solid fa-calendar-days text-teal-400"></i>
+                                    <span>Calculated Irrigation Target: <strong id="predicted-date-text"
+                                            class="text-emerald-400 font-bold">Checking...</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Array -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                        <div
+                            class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">7-Day
+                                    Rainfall History</p>
+                                <h3 id="metric-past-rain" class="text-xl font-bold text-blue-400 mt-1">0.0 mm</h3>
+                                <p class="text-[10px] text-slate-500">Natural precipitation total</p>
+                            </div>
+                            <div class="bg-blue-500/10 p-2.5 rounded-lg text-blue-400">
+                                <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">7-Day
+                                    Rainfall Forecast</p>
+                                <h3 id="metric-forecast-rain" class="text-xl font-bold text-orange-400 mt-1">0.0 mm</h3>
+                                <p id="metric-forecast-prob" class="text-[10px] text-slate-500">Max probability: 0%</p>
+                            </div>
+                            <div class="bg-orange-500/10 p-2.5 rounded-lg text-orange-400">
+                                <i class="fa-solid fa-cloud-showers-heavy text-lg"></i>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
+                            <div>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Current
+                                    Soil Moisture</p>
+                                <h3 id="metric-soil-moisture" class="text-xl font-bold text-emerald-400 mt-1">0.000 m³
+                                </h3>
+                                <p id="metric-soil-status" class="text-[10px] text-slate-500">Analyzing depth</p>
+                            </div>
+                            <div class="bg-emerald-500/10 p-2.5 rounded-lg text-emerald-400">
+                                <i class="fa-solid fa-droplet text-lg"></i>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Custom Interactive Graph -->
+                    <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-200">Dynamic Multi-Variable Plot</h3>
+                                <p class="text-xs text-slate-400">Comparing rainfall levels, maximum ambient
+                                    temperature, and soil humidity trends</p>
+                            </div>
+                            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                                <span class="flex items-center gap-1.5"><span
+                                        class="w-3 h-3 bg-blue-500 rounded-sm"></span> Rain</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="w-3 h-3 bg-cyan-500 rounded-sm"></span> Watered</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="w-3 h-1 bg-emerald-500 inline-block"></span> Soil Moisture</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="w-3 h-1 bg-red-500 inline-block"></span> Max Temp</span>
+                                <span class="flex items-center gap-1.5"><span
+                                        class="border-b-2 border-dashed border-red-500 w-4 inline-block"></span>
+                                    Predicted Target</span>
+                            </div>
+                        </div>
+                        <div class="relative w-full h-[320px] md:h-[380px]">
+                            <canvas id="weather-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Daily Log Table -->
+                    <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                            <div>
+                                <h3 class="font-bold text-sm text-slate-200">Daily Log & Irrigation Inputs</h3>
+                                <p class="text-xs text-slate-400">Log manual watering events directly in this table to
+                                    feed the advisor algorithm</p>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs md:text-sm">
+                                <thead>
+                                    <tr
+                                        class="border-b border-slate-700 text-xs font-semibold text-slate-400 uppercase">
+                                        <th class="py-3 px-3">Date</th>
+                                        <th class="py-3 px-3">Type</th>
+                                        <th class="py-3 px-3">Precipitation</th>
+                                        <th class="py-3 px-3">Rain Prob.</th>
+                                        <th class="py-3 px-3">Max Temp</th>
+                                        <th class="py-3 px-3">Avg Soil Humidity</th>
+                                        <th class="py-3 px-3 text-right">Watered Log</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="data-table-body" class="divide-y divide-slate-800 text-slate-200">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <footer class="mt-12 border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+        <p>© 2026 HydroTrack. Calibration parameters designed specifically for deep-rooted tomato beds with surface
+            evaporation barriers.</p>
+    </footer>
+
+    <!-- App Logic Execution -->
+    <script>
+        // Core State
+        const state = {
+            apiKey: localStorage.getItem('geoapify_key') || '',
+            favorites: JSON.parse(localStorage.getItem('saved_locations')) || [],
+            activeLocation: JSON.parse(localStorage.getItem('active_location')) || null,
+            soilProfile: localStorage.getItem('soil_profile') || 'mulched', // standard vs mulched
+            wateredLog: JSON.parse(localStorage.getItem('watered_log_multi')) || {}, // locationId -> { 'YYYY-MM-DD': 'light'|'medium'|'heavy' }
+            weatherData: null,
+            predictedWaterDate: null // calculated target YYYY-MM-DD
+        };
+
+        // Soil profiles parameters
+        const soilThresholds = {
+            standard: 0.18,
+            mulched: 0.12
+        };
+
+        let chartInstance = null;
+
+        // Custom Inline Chart.js Plugin to render a Target Line
+        const verticalTargetLinePlugin = {
+            id: 'verticalTargetLine',
+            afterDatasetsDraw(chart, args, options) {
+                const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+                const targetLabel = options.targetLabel; // Formatted date string to match labels
+                if (!targetLabel) return;
+
+                const index = chart.data.labels.indexOf(targetLabel);
+                if (index === -1) return;
+
+                const xPos = x.getPixelForValue(chart.data.labels[index]);
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.strokeStyle = '#ef4444'; // Red-500
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([4, 4]);
+                ctx.moveTo(xPos, top);
+                ctx.lineTo(xPos, bottom);
+                ctx.stroke();
+
+                // Draw Label Badge
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('TARGET WATER', xPos, top + 12);
+                ctx.restore();
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initUi();
+            if (state.activeLocation) {
+                fetchAndRenderWeather(state.activeLocation);
+            } else {
+                showEmptyState();
+            }
+        });
+
+        function initUi() {
+            document.getElementById('api-key-input').value = state.apiKey;
+            document.getElementById('soil-profile-select').value = state.soilProfile;
+            updateApiKeyStatusBadge();
+            renderFavorites();
+        }
+
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            const val = document.getElementById('api-key-input').value.trim();
+            state.apiKey = val;
+            localStorage.setItem('geoapify_key', val);
+            updateApiKeyStatusBadge();
+            setTimeout(() => {
+                document.getElementById('settings-panel').classList.add('hidden');
+            }, 800);
+        }
+
+        function updateApiKeyStatusBadge() {
+            const div = document.getElementById('api-key-status');
+            if (state.apiKey) {
+                div.innerHTML = `<span class="text-emerald-400"><i class="fa-solid fa-circle-check"></i> Geoapify Active (Key Saved)</span>`;
+            } else {
+                div.innerHTML = `<span class="text-amber-500"><i class="fa-solid fa-circle-exclamation"></i> Key missing. Postal lookup disabled, but you can search raw GPS coordinates (lat, lon).</span>`;
+            }
+        }
+
+        function changeSoilProfile(profile) {
+            state.soilProfile = profile;
+            localStorage.setItem('soil_profile', profile);
+            if (state.weatherData && state.activeLocation) {
+                renderDashboard(state.activeLocation);
+            }
+        }
+
+        // Search Handlers
+        async function handleSearchSubmit(event) {
+            event.preventDefault();
+            hideAlert();
+            const query = document.getElementById('location-query').value.trim();
+            if (!query) return;
+
+            const coordRegex = /^(-?\d+(\.\d+)?)\s*,\s*(-?\d+(\.\d+)?)$/;
+            const match = query.match(coordRegex);
+
+            if (match) {
+                const lat = parseFloat(match[1]);
+                const lon = parseFloat(match[3]);
+                const locObj = {
+                    id: `gps-${lat.toFixed(4)}-${lon.toFixed(4)}`,
+                    name: `GPS Bed (${lat.toFixed(4)}, ${lon.toFixed(4)})`,
+                    lat: lat,
+                    lon: lon,
+                    formatted: `Latitude: ${lat.toFixed(4)}, Longitude: ${lon.toFixed(4)}`
+                };
+                setActiveLocation(locObj);
+            } else {
+                if (!state.apiKey) {
+                    showAlert("An API key is required to parse locations or postal codes. Enter one in Settings or input raw coordinate pairs directly (e.g. 49.1, -122.8).");
+                    return;
+                }
+                showLoadingState();
+                const res = await geocodeQuery(query);
+                if (res) {
+                    setActiveLocation(res);
+                } else {
+                    hideLoadingState();
+                    showAlert("Location lookup failed. Verify your API key or the spelling of your query.");
+                }
+            }
+        }
+
+        async function geocodeQuery(text) {
+            const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(text)}&apiKey=${state.apiKey}`;
+            try {
+                const res = await fetch(url);
+                if (res.status === 200) {
+                    const data = await res.json();
+                    if (data && data.features && data.features.length > 0) {
+                        const feat = data.features[0].properties;
+                        return {
+                            id: `geo-${feat.lat.toFixed(4)}-${feat.lon.toFixed(4)}`,
+                            name: feat.formatted,
+                            lat: feat.lat,
+                            lon: feat.lon,
+                            formatted: feat.formatted
+                        };
+                    }
+                }
+            } catch (err) {
+                console.error("Geocoding service error:", err);
+            }
+            return null;
+        }
+
+        function getCurrentGPS() {
+            hideAlert();
+            if (!navigator.geolocation) {
+                showAlert("Geolocation is not supported by your browser.");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                async (pos) => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    let locObj = {
+                        id: `gps-${lat.toFixed(4)}-${lon.toFixed(4)}`,
+                        name: `My Garden (${lat.toFixed(3)}, ${lon.toFixed(3)})`,
+                        lat: lat,
+                        lon: lon,
+                        formatted: `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`
+                    };
+                    if (state.apiKey) {
+                        try {
+                            const revUrl = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${state.apiKey}`;
+                            const res = await fetch(revUrl);
+                            if (res.status === 200) {
+                                const data = await res.json();
+                                if (data && data.features && data.features.length > 0) {
+                                    const feat = data.features[0].properties;
+                                    locObj.name = feat.formatted;
+                                    locObj.formatted = feat.formatted;
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Failed reverse lookup", e);
+                        }
+                    }
+                    setActiveLocation(locObj);
+                },
+                (err) => showAlert(`GPS failed: ${err.message}`)
+            );
+        }
+
+        function setActiveLocation(loc) {
+            state.activeLocation = loc;
+            localStorage.setItem('active_location', JSON.stringify(loc));
+            updateFavoriteButtonState();
+            fetchAndRenderWeather(loc);
+        }
+
+        // Load Weather Data
+        async function fetchAndRenderWeather(loc) {
+            showLoadingState();
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&past_days=7&timezone=auto`;
+
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error("Could not download records");
+                const raw = await res.json();
+                processWeatherData(raw);
+                renderDashboard(loc);
+                hideLoadingState();
+            } catch (err) {
+                console.error(err);
+                showAlert("Failed to contact Open-Meteo. Please try again.");
+                hideLoadingState();
+            }
+        }
+
+        function processWeatherData(data) {
+            const todayStr = getLocalDateString();
+            const dailyDates = data.daily.time;
+            const rainSum = data.daily.precipitation_sum;
+            const rainProb = data.daily.precipitation_probability_max;
+            const tempMax = data.daily.temperature_2m_max;
+
+            // Average Hourly Soil Moisture to Daily
+            const soilByDay = {};
+            data.hourly.time.forEach((tStr, idx) => {
+                const datePart = tStr.substring(0, 10);
+                if (!soilByDay[datePart]) soilByDay[datePart] = [];
+                if (data.hourly.soil_moisture_3_to_9cm[idx] !== null) {
+                    soilByDay[datePart].push(data.hourly.soil_moisture_3_to_9cm[idx]);
+                }
+            });
+
+            const avgSoil = {};
+            for (const d in soilByDay) {
+                const values = soilByDay[d];
+                avgSoil[d] = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length) : 0;
+            }
+
+            state.weatherData = dailyDates.map((date, idx) => {
+                return {
+                    date: date,
+                    isPast: date <= todayStr,
+                    rain: rainSum[idx] || 0,
+                    prob: rainProb[idx] || 0,
+                    tempMax: tempMax[idx] || 0,
+                    soil: avgSoil[date] || 0
+                };
+            });
+        }
+
+        function renderDashboard(loc) {
+            document.getElementById('empty-dashboard-state').classList.add('hidden');
+            document.getElementById('active-dashboard').classList.remove('hidden');
+
+            document.getElementById('active-location-title').innerText = loc.name;
+            document.getElementById('active-location-coords').innerText = `Lat: ${loc.lat.toFixed(4)}, Lon: ${loc.lon.toFixed(4)}`;
+
+            const pastRainTotal = state.weatherData.filter(d => d.isPast).reduce((a, c) => a + c.rain, 0);
+            const forecastRainTotal = state.weatherData.filter(d => !d.isPast).reduce((a, c) => a + c.rain, 0);
+            const maxForecastProb = state.weatherData.filter(d => !d.isPast).reduce((a, c) => c.prob > a ? c.prob : a, 0);
+
+            const todayStr = getLocalDateString();
+            const soilToday = state.weatherData.find(d => d.date === todayStr)?.soil || 0;
+
+            document.getElementById('metric-past-rain').innerText = `${pastRainTotal.toFixed(1)} mm`;
+            document.getElementById('metric-forecast-rain').innerText = `${forecastRainTotal.toFixed(1)} mm`;
+            document.getElementById('metric-forecast-prob').innerText = `Max probability: ${maxForecastProb}%`;
+            document.getElementById('metric-soil-moisture').innerText = `${soilToday.toFixed(3)} m³/m³`;
+
+            const currentThresh = soilThresholds[state.soilProfile];
+            const soilStatus = document.getElementById('metric-soil-status');
+            if (soilToday === 0) {
+                soilStatus.innerText = "No reading today";
+                soilStatus.className = "text-[10px] text-slate-500 mt-1";
+            } else if (soilToday < currentThresh) {
+                soilStatus.innerText = `Critical drying (Below ${currentThresh})`;
+                soilStatus.className = "text-[10px] text-red-400 mt-1 font-semibold";
+            } else {
+                soilStatus.innerText = `Adequate moisture (Above ${currentThresh})`;
+                soilStatus.className = "text-[10px] text-emerald-400 mt-1 font-semibold";
+            }
+
+            // Execute predictive modules before rendering viewports
+            calculatePredictedWateringDate();
+            runWateringAdvisor();
+            drawChart();
+            renderTable();
+            updateFavoriteButtonState();
+        }
+
+        // PREDICTIVE TARGET ALGORITHM
+        function calculatePredictedWateringDate() {
+            const todayStr = getLocalDateString();
+            const locId = state.activeLocation.id;
+            const log = state.wateredLog[locId] || {};
+            const criticalThresh = soilThresholds[state.soilProfile];
+
+            // 1. Get safety duration based on last registered manual watering log
+            let lastWaterDate = null;
+            let protectionDays = 0;
+
+            for (let i = 0; i < 4; i++) {
+                const dateCheck = new Date();
+                dateCheck.setDate(dateCheck.getDate() - i);
+                const checkStr = dateCheck.toLocaleDateString('en-CA');
+
+                if (log[checkStr] && log[checkStr] !== 'none') {
+                    lastWaterDate = new Date(dateCheck);
+                    if (log[checkStr] === 'heavy') protectionDays = 4;
+                    else if (log[checkStr] === 'medium') protectionDays = 2;
+                    else if (log[checkStr] === 'light') protectionDays = 1;
+                    break;
+                }
+            }
+
+            let protectionExpiresStr = null;
+            if (lastWaterDate) {
+                const expDate = new Date(lastWaterDate);
+                expDate.setDate(expDate.getDate() + protectionDays);
+                protectionExpiresStr = expDate.toLocaleDateString('en-CA');
+            }
+
+            // 2. Locate first forecast date when Open-Meteo projects drop below critical threshold
+            let forecastDryDate = null;
+            for (let i = 0; i < state.weatherData.length; i++) {
+                const day = state.weatherData[i];
+                if (day.date > todayStr) {
+                    if (day.soil < criticalThresh) {
+                        forecastDryDate = day.date;
+                        break;
+                    }
+                }
+            }
+
+            // 3. Resolve max index date
+            let finalTarget = null;
+            if (forecastDryDate && protectionExpiresStr) {
+                finalTarget = (forecastDryDate > protectionExpiresStr) ? forecastDryDate : protectionExpiresStr;
+            } else if (forecastDryDate) {
+                finalTarget = forecastDryDate;
+            } else if (protectionExpiresStr) {
+                finalTarget = protectionExpiresStr;
+            }
+
+            // Ensure our suggestion doesn't point to the past or today
+            if (finalTarget && finalTarget > todayStr) {
+                state.predictedWaterDate = finalTarget;
+            } else {
+                state.predictedWaterDate = null;
+            }
+        }
+
+        // WATERING ADVISOR ENGINE
+        function runWateringAdvisor() {
+            const todayStr = getLocalDateString();
+            const locId = state.activeLocation.id;
+            const log = state.wateredLog[locId] || {};
+            const criticalThresh = soilThresholds[state.soilProfile];
+
+            let wateringProtectionActive = false;
+            let wateringImpactType = '';
+            let wateringImpactAge = 0;
+
+            const daysToCheck = [0, 1, 2, 3];
+            const dateObjs = daysToCheck.map(offset => {
+                const d = new Date();
+                d.setDate(d.getDate() - offset);
+                return d.toLocaleDateString('en-CA');
+            });
+
+            for (let i = 0; i < 4; i++) {
+                if (log[dateObjs[i]] === 'heavy') {
+                    wateringProtectionActive = true;
+                    wateringImpactType = 'Heavy (💧💧💧)';
+                    wateringImpactAge = i;
+                    break;
+                }
+            }
+
+            if (!wateringProtectionActive) {
+                for (let i = 0; i <= 1; i++) {
+                    if (log[dateObjs[i]] === 'medium') {
+                        wateringProtectionActive = true;
+                        wateringImpactType = 'Medium (💧💧)';
+                        wateringImpactAge = i;
+                        break;
+                    }
+                }
+            }
+
+            if (!wateringProtectionActive) {
+                if (log[dateObjs[0]] === 'light') {
+                    wateringProtectionActive = true;
+                    wateringImpactType = 'Light (💧)';
+                    wateringImpactAge = 0;
+                }
+            }
+
+            const upcomingRain = state.weatherData
+                .filter(d => !d.isPast && d.date > todayStr)
+                .slice(0, 2);
+            const totalUpcomingRain = upcomingRain.reduce((a, c) => a + c.rain, 0);
+            const maxUpcomingProb = upcomingRain.reduce((a, c) => c.prob > a ? c.prob : a, 0);
+            const incomingHeavyRain = totalUpcomingRain >= 5.0 && maxUpcomingProb >= 50;
+
+            const upcomingHeat = state.weatherData
+                .filter(d => d.date >= todayStr)
+                .slice(0, 3);
+            const maxUpcomingTemp = upcomingHeat.reduce((a, c) => c.tempMax > a ? c.tempMax : a, 0);
+            const highHeatIncoming = maxUpcomingTemp >= 27.0;
+
+            const currentSoil = state.weatherData.find(d => d.date === todayStr)?.soil || 0;
+            const soilIsDry = currentSoil < criticalThresh;
+            const soilIsBorderline = currentSoil >= criticalThresh && currentSoil < (criticalThresh + 0.04);
+
+            // Populate visual recommendation descriptions
+            const desc = document.getElementById('advisor-description');
+
+            if (wateringProtectionActive) {
+                setAdvisorUi('neutral', 'Hold Off', `You logged a ${wateringImpactType} watering event ${wateringImpactAge === 0 ? 'today' : wateringImpactAge + ' day(s) ago'}. Combined with your cardboard mulch, this water is insulated at the lower root zone. Skip watering to avoid waterlogged soil.`);
+            } else if (incomingHeavyRain) {
+                setAdvisorUi('rain', 'Rain Protected', `Significant rainfall is expected in the next 48 hours (~${totalUpcomingRain.toFixed(1)}mm with up to ${maxUpcomingProb}% chance). Let natural precipitation refresh the bed.`);
+            } else if (soilIsDry) {
+                setAdvisorUi('alert', 'Water Recommended', `Ground soil moisture of ${currentSoil.toFixed(3)} m³/m³ is below your configured ${state.soilProfile === 'mulched' ? 'Mulched' : 'Standard'} threshold of ${criticalThresh}. Perform a deep soak.`);
+            } else if (highHeatIncoming && (soilIsBorderline || soilIsDry)) {
+                setAdvisorUi('heat', 'Preemptive Water', `A heat stress threshold is expected within 3 days (Max temp: ${maxUpcomingTemp.toFixed(1)}°C). Although soil levels look normal, pre-watering deep roots will help prevent leaf-drop.`);
+            } else if (soilIsBorderline) {
+                setAdvisorUi('neutral', 'Monitor Moisture', `Soil humidity (${currentSoil.toFixed(3)}) is approaching critical limits. No action is needed yet, but monitor closely over the next 24 hours.`);
+            } else {
+                setAdvisorUi('safe', 'Optimally Moist', `Current soil status (${currentSoil.toFixed(3)}) is stable. Evaporation protection from your cardboard mulch is conserving moisture. No action needed.`);
+            }
+
+            // Update Target Date text element
+            const pText = document.getElementById('predicted-date-text');
+            if (state.predictedWaterDate) {
+                const formattedPred = parseAndFormatDateString(state.predictedWaterDate);
+                const diffTime = Math.abs(new Date(state.predictedWaterDate) - new Date(todayStr));
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                pText.innerHTML = `${formattedPred} <span class="text-[10px] bg-emerald-500/10 px-1.5 py-0.5 rounded ml-1 font-bold">In ${diffDays} day${diffDays > 1 ? 's' : ''}</span>`;
+            } else {
+                pText.innerText = "No irrigation required in current forecast window.";
+            }
+        }
+
+        function setAdvisorUi(type, badgeText, descriptionText) {
+            const card = document.getElementById('advisor-card');
+            const iconWrapper = document.getElementById('advisor-icon-wrapper');
+            const icon = document.getElementById('advisor-icon');
+            const statusBadge = document.getElementById('advisor-status-badge');
+
+            card.className = "border rounded-2xl p-6 shadow-xl transition-all ";
+            iconWrapper.className = "p-3.5 rounded-xl text-white flex items-center justify-center ";
+            icon.className = "fa-solid text-2xl ";
+            statusBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ";
+
+            statusBadge.innerText = badgeText;
+
+            if (type === 'safe') {
+                card.classList.add('bg-emerald-950/20', 'border-emerald-800/40');
+                iconWrapper.classList.add('bg-emerald-500');
+                icon.classList.add('fa-face-smile');
+                statusBadge.classList.add('bg-emerald-500/20', 'text-emerald-400');
+            } else if (type === 'neutral') {
+                card.classList.add('bg-slate-900/40', 'border-slate-800');
+                iconWrapper.classList.add('bg-slate-600');
+                icon.classList.add('fa-circle-info');
+                statusBadge.classList.add('bg-slate-700/50', 'text-slate-300');
+            } else if (type === 'rain') {
+                card.classList.add('bg-sky-950/20', 'border-sky-800/40');
+                iconWrapper.classList.add('bg-sky-500');
+                icon.classList.add('fa-umbrella');
+                statusBadge.classList.add('bg-sky-500/20', 'text-sky-400');
+            } else if (type === 'heat') {
+                card.classList.add('bg-amber-950/30', 'border-amber-800/40');
+                iconWrapper.classList.add('bg-amber-500');
+                icon.classList.add('fa-temperature-high');
+                statusBadge.classList.add('bg-amber-500/20', 'text-amber-400');
+            } else if (type === 'alert') {
+                card.classList.add('bg-red-950/30', 'border-red-800/40');
+                iconWrapper.classList.add('bg-red-500');
+                icon.classList.add('fa-faucet-drip');
+                statusBadge.classList.add('bg-red-500/20', 'text-red-400');
+            }
+        }
+
+        // Render Data Log Table
+        function renderTable() {
+            const tbody = document.getElementById('data-table-body');
+            tbody.innerHTML = '';
+            const locKey = state.activeLocation.id;
+            const log = state.wateredLog[locKey] || {};
+            const todayStr = getLocalDateString();
+
+            state.weatherData.forEach(day => {
+                const formattedDate = parseAndFormatDateString(day.date);
+                const currentSelection = log[day.date] || 'none';
+                const isTargetDate = (day.date === state.predictedWaterDate);
+
+                const tr = document.createElement('tr');
+                tr.className = `border-b border-slate-800 hover:bg-slate-800/40 transition-all ${day.date === todayStr ? 'bg-blue-950/20' : ''} ${isTargetDate ? 'bg-red-950/10' : ''}`;
+
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-semibold ${day.date === todayStr ? 'text-emerald-400' : ''} ${isTargetDate ? 'text-red-400' : ''}">
+                        ${formattedDate} 
+                        ${day.date === todayStr ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded ml-1 font-bold uppercase">Today</span>' : ''}
+                        ${isTargetDate ? '<span class="text-[9px] bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded ml-1 font-bold uppercase"><i class="fa-solid fa-droplet text-[8px] mr-0.5"></i> Target</span>' : ''}
+                    </td>
+                    <td class="py-3 px-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${day.isPast ? 'bg-slate-800 text-slate-400' : 'bg-orange-500/10 text-orange-400'}">
+                            ${day.isPast ? 'Past' : 'Forecast'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 font-mono font-bold">${day.rain.toFixed(1)} mm</td>
+                    <td class="py-3 px-3 font-mono text-slate-400">${day.prob > 0 ? `${day.prob}%` : '-'}</td>
+                    <td class="py-3 px-3 font-semibold text-red-400">${day.tempMax.toFixed(1)}°C</td>
+                    <td class="py-3 px-3 font-mono text-emerald-400 font-medium">${day.soil > 0 ? day.soil.toFixed(3) : 'N/A'}</td>
+                    <td class="py-3 px-3 text-right">
+                        <select onchange="updateWaterLevel('${day.date}', this.value)" class="bg-slate-950 border border-slate-700 rounded px-1.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-teal-500">
+                            <option value="none" ${currentSelection === 'none' ? 'selected' : ''}>None</option>
+                            <option value="light" ${currentSelection === 'light' ? 'selected' : ''}>Light (💧)</option>
+                            <option value="medium" ${currentSelection === 'medium' ? 'selected' : ''}>Medium (💧💧)</option>
+                            <option value="heavy" ${currentSelection === 'heavy' ? 'selected' : ''}>Heavy (💧💧💧)</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateWaterLevel(dateStr, level) {
+            const locId = state.activeLocation.id;
+            if (!state.wateredLog[locId]) {
+                state.wateredLog[locId] = {};
+            }
+
+            if (level === 'none') {
+                delete state.wateredLog[locId][dateStr];
+            } else {
+                state.wateredLog[locId][dateStr] = level;
+            }
+
+            localStorage.setItem('watered_log_multi', JSON.stringify(state.wateredLog));
+
+            // Instantly update targets and state logic
+            calculatePredictedWateringDate();
+            runWateringAdvisor();
+            drawChart();
+            renderTable();
+        }
+
+        // Draw Custom Chart
+        function drawChart() {
+            const ctx = document.getElementById('weather-chart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+
+            const dates = state.weatherData.map(d => parseAndFormatDateString(d.date));
+            const rawDates = state.weatherData.map(d => d.date);
+            const rainData = state.weatherData.map(d => d.rain);
+            const soilData = state.weatherData.map(d => d.soil);
+            const tempMaxData = state.weatherData.map(d => d.tempMax);
+
+            const locId = state.activeLocation.id;
+            const log = state.wateredLog[locId] || {};
+            const todayStr = getLocalDateString();
+
+            const barBgColors = rawDates.map(d => {
+                const water = log[d];
+                if (water === 'heavy') return 'rgba(6, 182, 212, 0.9)';
+                if (water === 'medium') return 'rgba(6, 182, 212, 0.6)';
+                if (water === 'light') return 'rgba(6, 182, 212, 0.35)';
+                return d <= todayStr ? 'rgba(59, 130, 246, 0.55)' : 'rgba(249, 115, 22, 0.45)';
+            });
+
+            const barBorderColors = rawDates.map(d => {
+                const water = log[d];
+                if (water) return '#22d3ee';
+                return d <= todayStr ? '#3b82f6' : '#f97316';
+            });
+
+            // Convert predicted ISO date to chart label format
+            const chartTargetLabel = state.predictedWaterDate ? parseAndFormatDateString(state.predictedWaterDate) : null;
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Water Inputs (mm)',
+                            data: rainData,
+                            backgroundColor: barBgColors,
+                            borderColor: barBorderColors,
+                            borderWidth: 1.5,
+                            yAxisID: 'yRain',
+                            order: 3,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Soil Moisture (m³/m³)',
+                            data: soilData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#10b981',
+                            tension: 0.3,
+                            fill: true,
+                            type: 'line',
+                            yAxisID: 'ySoil',
+                            order: 1
+                        },
+                        {
+                            label: 'Max Temperature (°C)',
+                            data: tempMaxData,
+                            borderColor: '#ef4444',
+                            borderWidth: 1.5,
+                            borderDash: [5, 5],
+                            pointStyle: 'crossRot',
+                            pointHoverRadius: 6,
+                            pointRadius: 2,
+                            tension: 0.2,
+                            fill: false,
+                            type: 'line',
+                            yAxisID: 'yTemp',
+                            order: 2
+                        }
+                    ]
+                },
+                plugins: [verticalTargetLinePlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        },
+                        yRain: {
+                            type: 'linear',
+                            position: 'left',
+                            title: { display: true, text: 'Rain / Water Vol (mm)', color: '#3b82f6', font: { weight: 'bold', size: 11 } },
+                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
+                            ticks: { color: '#94a3b8' },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        },
+                        ySoil: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: true, text: 'Soil Moisture (m³/m³)', color: '#10b981', font: { weight: 'bold', size: 11 } },
+                            grid: { drawOnChartArea: false },
+                            ticks: { color: '#94a3b8' },
+                            suggestedMin: 0.08,
+                            suggestedMax: 0.38
+                        },
+                        yTemp: {
+                            type: 'linear',
+                            position: 'right',
+                            title: { display: false },
+                            grid: { drawOnChartArea: false },
+                            ticks: { display: false },
+                            suggestedMin: 5,
+                            suggestedMax: 35
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        verticalTargetLine: {
+                            targetLabel: chartTargetLabel
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        if (context.datasetIndex === 1) {
+                                            label += context.parsed.y.toFixed(3);
+                                        } else {
+                                            label += context.parsed.y.toFixed(1);
+                                        }
+                                    }
+                                    const index = context.dataIndex;
+                                    const dateKey = rawDates[index];
+                                    const waterLevel = log[dateKey];
+                                    if (context.datasetIndex === 0 && waterLevel) {
+                                        label += ` (Watered: ${waterLevel.toUpperCase()})`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Favorites Handling
+        function toggleCurrentFavorite() {
+            if (!state.activeLocation) return;
+            const idx = state.favorites.findIndex(fav => fav.id === state.activeLocation.id);
+            if (idx > -1) {
+                state.favorites.splice(idx, 1);
+            } else {
+                state.favorites.push(state.activeLocation);
+            }
+            localStorage.setItem('saved_locations', JSON.stringify(state.favorites));
+            renderFavorites();
+            updateFavoriteButtonState();
+        }
+
+        function renderFavorites() {
+            const container = document.getElementById('favorites-list');
+            container.innerHTML = '';
+            if (state.favorites.length === 0) {
+                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">No saved beds.</div>`;
+                return;
+            }
+            state.favorites.forEach(fav => {
+                const isActive = state.activeLocation && state.activeLocation.id === fav.id;
+                const div = document.createElement('div');
+                div.className = `group flex justify-between items-center p-2.5 rounded-lg text-xs cursor-pointer border transition-all ${isActive ? 'bg-emerald-600/10 border-emerald-500/50 text-emerald-300' : 'bg-slate-900/50 hover:bg-slate-800 border-slate-800 text-slate-300'
+                    }`;
+                div.innerHTML = `
+                    <div onclick="selectFavorite('${fav.id}')" class="flex-grow font-semibold truncate pr-2">
+                        <i class="fa-solid fa-seedling mr-1.5 text-emerald-500"></i> ${fav.name}
+                    </div>
+                    <button onclick="deleteFavorite(event, '${fav.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-400 text-slate-500 p-1 rounded transition-opacity">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function selectFavorite(id) {
+            const match = state.favorites.find(fav => fav.id === id);
+            if (match) setActiveLocation(match);
+        }
+
+        function deleteFavorite(event, id) {
+            event.stopPropagation();
+            state.favorites = state.favorites.filter(fav => fav.id !== id);
+            localStorage.setItem('saved_locations', JSON.stringify(state.favorites));
+            renderFavorites();
+            updateFavoriteButtonState();
+        }
+
+        function updateFavoriteButtonState() {
+            const btn = document.getElementById('favorite-current-btn');
+            if (!state.activeLocation) {
+                btn.classList.add('hidden');
+                return;
+            }
+            btn.classList.remove('hidden');
+            const isSaved = state.favorites.some(fav => fav.id === state.activeLocation.id);
+            if (isSaved) {
+                btn.innerHTML = `<i class="fa-solid fa-star text-yellow-500"></i> <span class="text-yellow-500 hover:underline">Saved</span>`;
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-plus text-blue-400"></i> <span class="text-blue-400 hover:underline">Save Bed</span>`;
+            }
+        }
+
+        function refreshCurrentLocation() {
+            if (state.activeLocation) fetchAndRenderWeather(state.activeLocation);
+        }
+
+        // Helpers
+        function parseAndFormatDateString(isoString) {
+            const parts = isoString.split('-');
+            const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            return dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        }
+
+        function getLocalDateString() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function loadSampleLocation() {
+            setActiveLocation({
+                id: "geo-49.2827--123.1207",
+                name: "Vancouver Tomato Bed",
+                lat: 49.2827,
+                lon: -123.1207,
+                formatted: "Vancouver, BC, Canada"
+            });
+        }
+
+        function showAlert(message) {
+            const box = document.getElementById('alert-box');
+            document.getElementById('alert-message').innerText = message;
+            box.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function hideAlert() {
+            document.getElementById('alert-box').classList.add('hidden');
+        }
+
+        function showEmptyState() {
+            document.getElementById('empty-dashboard-state').classList.remove('hidden');
+            document.getElementById('active-dashboard').classList.add('hidden');
+        }
+
+        function showLoadingState() {
+            document.body.style.cursor = 'wait';
+        }
+
+        function hideLoadingState() {
+            document.body.style.cursor = 'default';
+        }
+    </script>
+</body>
+
+</html>
