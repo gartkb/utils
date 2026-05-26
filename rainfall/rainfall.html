@@ -532,63 +532,116 @@
         // Load Weather Data
         async function fetchAndRenderWeather(loc) {
             showLoadingState();
-            // Reverted directly back to daily=precipitation_sum, matching the Discord bot exactly
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&past_days=7&timezone=auto`;
+
+            // Format dynamic dates for the historical API
+            const today = new Date();
+            const getISOString = (d) => {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
+
+            const yesterdayObj = new Date(today.getTime() - (24 * 60 * 60 * 1000));
+            const sevenDaysAgoObj = new Date(today.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+            const startDate = getISOString(sevenDaysAgoObj);
+            const endDate = getISOString(yesterdayObj);
+
+            // Parallel Blending: Fetch guaranteed historical archive & standard future forecast in tandem
+            const archiveUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lon}&start_date=${startDate}&end_date=${endDate}&daily=precipitation_sum,temperature_2m_max&hourly=soil_moisture_3_to_9cm&timezone=auto`;
+            const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&timezone=auto`;
             
             try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error("Could not download records");
-                const raw = await res.json();
-                processWeatherData(raw);
+                const [archiveRes, forecastRes] = await Promise.all([
+                    fetch(archiveUrl),
+                    fetch(forecastUrl)
+                ]);
+
+                if (!archiveRes.ok || !forecastRes.ok) throw new Error("Could not download records");
+
+                const archiveData = await archiveRes.json();
+                const forecastData = await forecastRes.json();
+
+                blendWeatherData(archiveData, forecastData);
                 renderDashboard(loc);
                 hideLoadingState();
             } catch (err) {
                 console.error(err);
-                showAlert("Failed to contact Open-Meteo. Please try again.");
+                showAlert("Failed to contact meteorological networks. Please check coordinates and retry.");
                 hideLoadingState();
             }
         }
 
-        function processWeatherData(data) {
-            // Calculate EXACT local date using UTC offset to maintain consistent timelines
-            const localTimeAtLocation = new Date(Date.now() + (data.utc_offset_seconds * 1000));
+        function blendWeatherData(archive, forecast) {
+            // Find the active day aligned with local coordinate time
+            const localTimeAtLocation = new Date(Date.now() + (forecast.utc_offset_seconds * 1000));
             const year = localTimeAtLocation.getUTCFullYear();
             const month = String(localTimeAtLocation.getUTCMonth() + 1).padStart(2, '0');
             const day = String(localTimeAtLocation.getUTCDate()).padStart(2, '0');
             const todayStr = `${year}-${month}-${day}`;
 
-            const dailyDates = data.daily.time;
-            const rainSum = data.daily.precipitation_sum;
-            const rainProb = data.daily.precipitation_probability_max;
-            const tempMax = data.daily.temperature_2m_max;
+            // 1. Process Archive (Past 7 Days -> Yesterday)
+            const archiveDates = archive.daily.time;
+            const archiveRain = archive.daily.precipitation_sum;
+            const archiveTemp = archive.daily.temperature_2m_max;
 
-            // 1. Average Hourly Soil Moisture to Daily
-            const soilByDay = {};
-            data.hourly.time.forEach((tStr, idx) => {
+            const archiveSoilByDay = {};
+            archive.hourly.time.forEach((tStr, idx) => {
                 const datePart = tStr.substring(0, 10);
-                if (!soilByDay[datePart]) soilByDay[datePart] = [];
-                if (data.hourly.soil_moisture_3_to_9cm[idx] !== null) {
-                    soilByDay[datePart].push(data.hourly.soil_moisture_3_to_9cm[idx]);
+                if (!archiveSoilByDay[datePart]) archiveSoilByDay[datePart] = [];
+                if (archive.hourly.soil_moisture_3_to_9cm[idx] !== null) {
+                    archiveSoilByDay[datePart].push(archive.hourly.soil_moisture_3_to_9cm[idx]);
                 }
             });
 
-            const avgSoil = {};
-            for (const d in soilByDay) {
-                const values = soilByDay[d];
-                avgSoil[d] = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length) : 0;
-            }
-
-            // 2. Assemble Daily Weather Dataset using the daily precipitation sum
-            state.weatherData = dailyDates.map((date, idx) => {
+            const archiveList = archiveDates.map((date, idx) => {
+                const soilVals = archiveSoilByDay[date] || [];
+                const avgSoil = soilVals.length > 0 ? (soilVals.reduce((a, b) => a + b, 0) / soilVals.length) : 0;
                 return {
                     date: date,
-                    isPast: date <= todayStr,
-                    rain: rainSum[idx] || 0, // Direct daily aggregation matching your bot snippet
-                    prob: rainProb[idx] || 0,
-                    tempMax: tempMax[idx] || 0,
-                    soil: avgSoil[date] || 0
+                    isPast: true,
+                    rain: archiveRain[idx] || 0,
+                    prob: 0, // No probability for archived actuals
+                    tempMax: archiveTemp[idx] || 0,
+                    soil: avgSoil
                 };
             });
+
+            // 2. Process Forecast (Today -> Future)
+            const forecastDates = forecast.daily.time;
+            const forecastRain = forecast.daily.precipitation_sum;
+            const forecastProb = forecast.daily.precipitation_probability_max;
+            const forecastTemp = forecast.daily.temperature_2m_max;
+
+            const forecastSoilByDay = {};
+            forecast.hourly.time.forEach((tStr, idx) => {
+                const datePart = tStr.substring(0, 10);
+                if (!forecastSoilByDay[datePart]) forecastSoilByDay[datePart] = [];
+                if (forecast.hourly.soil_moisture_3_to_9cm[idx] !== null) {
+                    forecastSoilByDay[datePart].push(forecast.hourly.soil_moisture_3_to_9cm[idx]);
+                }
+            });
+
+            const forecastList = [];
+            forecastDates.forEach((date, idx) => {
+                // Ensure we only include today and future dates from the forecast call
+                if (date >= todayStr) {
+                    const soilVals = forecastSoilByDay[date] || [];
+                    const avgSoil = soilVals.length > 0 ? (soilVals.reduce((a, b) => a + b, 0) / soilVals.length) : 0;
+                    forecastList.push({
+                        date: date,
+                        isPast: date === todayStr, // Today is flagged past for manual logging purposes
+                        rain: forecastRain[idx] || 0,
+                        prob: forecastProb[idx] || 0,
+                        tempMax: forecastTemp[idx] || 0,
+                        soil: avgSoil
+                    });
+                }
+            });
+
+            // 3. Concatenate clean datasets
+            state.weatherData = [...archiveList, ...forecastList];
         }
 
         function renderDashboard(loc) {
@@ -1134,6 +1187,7 @@
             });
         }
 
+        // Error message visual controllers
         function showAlert(message) {
             const box = document.getElementById('alert-box');
             document.getElementById('alert-message').innerText = message;
