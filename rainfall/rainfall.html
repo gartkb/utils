@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
-
 <head>
     <link rel="icon" type="image/svg+xml" href="hydrotrack.svg">
     <meta charset="UTF-8">
@@ -12,7 +11,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <!-- Favicon link -->
+    <link rel="icon" type="image/svg+xml" href="hydrotrack.svg">
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -38,22 +39,18 @@
             width: 8px;
             height: 8px;
         }
-
         ::-webkit-scrollbar-track {
             background: #0f172a;
         }
-
         ::-webkit-scrollbar-thumb {
             background: #334155;
             border-radius: 4px;
         }
-
         ::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
     </style>
 </head>
-
 <body class="bg-darkBg text-slate-100 min-h-screen font-sans antialiased">
 
     <!-- Header Navigation -->
@@ -65,17 +62,14 @@
                 </div>
                 <div>
                     <h1 class="font-bold text-lg tracking-tight flex items-center gap-2">
-                        HydroTrack <span
-                            class="text-xs bg-emerald-500/20 text-emerald-400 font-semibold px-2 py-0.5 rounded">Predictive
-                            Tomato Edition</span>
+                        HydroTrack <span class="text-xs bg-emerald-500/20 text-emerald-400 font-semibold px-2 py-0.5 rounded">Predictive Tomato Edition</span>
                     </h1>
                     <p class="text-xs text-slate-400">Microclimate-adjusted Irrigation Assistant</p>
                 </div>
             </div>
-
+            
             <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <button onclick="toggleSettings()"
-                    class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-sm transition-all">
+                <button onclick="toggleSettings()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-sm transition-all">
                     <i class="fa-solid fa-sliders text-slate-400"></i>
                     <span>App Settings</span>
                 </button>
@@ -84,7 +78,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto p-4 lg:p-6">
-
+        
         <!-- Settings drawer (API keys and Soil profiles) -->
         <div id="settings-panel" class="hidden mb-6 bg-slate-800/90 border border-slate-700 rounded-xl p-5 shadow-xl">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -94,16 +88,11 @@
                         <i class="fa-solid fa-key text-yellow-500"></i> Geoapify Configuration
                     </h3>
                     <p class="text-xs text-slate-400 mb-3">
-                        Required to search locations by postal code or address. Paste your key from <a
-                            href="https://myprojects.geoapify.com/" target="_blank"
-                            class="text-blue-400 underline hover:text-blue-300">geoapify.com</a>.
+                        Required to search locations by postal code or address. Paste your key from <a href="https://myprojects.geoapify.com/" target="_blank" class="text-blue-400 underline hover:text-blue-300">geoapify.com</a>.
                     </p>
                     <div class="flex gap-2">
-                        <input type="password" id="api-key-input" placeholder="Paste Geoapify API Key..."
-                            class="flex-grow bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-200">
-                        <button onclick="saveApiKey()"
-                            class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-all">Save
-                            Key</button>
+                        <input type="password" id="api-key-input" placeholder="Paste Geoapify API Key..." class="flex-grow bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 text-slate-200">
+                        <button onclick="saveApiKey()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-semibold transition-all">Save Key</button>
                     </div>
                     <div id="api-key-status" class="mt-2 text-[11px]"></div>
                 </div>
@@ -114,18 +103,14 @@
                         <i class="fa-solid fa-layer-group text-emerald-500"></i> Soil & Plant Calibration Profile
                     </h3>
                     <p class="text-xs text-slate-400 mb-3">
-                        Adjusts the critical soil moisture threshold based on your raised-bed and mulching
-                        configuration.
+                        Adjusts the critical soil moisture threshold based on your raised-bed and mulching configuration.
                     </p>
                     <div class="space-y-3">
                         <div>
-                            <label for="soil-profile-select" class="block text-xs text-slate-400 mb-1">Microclimate
-                                Profile</label>
-                            <select id="soil-profile-select" onchange="changeSoilProfile(this.value)"
-                                class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 text-slate-200">
+                            <label for="soil-profile-select" class="block text-xs text-slate-400 mb-1">Microclimate Profile</label>
+                            <select id="soil-profile-select" onchange="changeSoilProfile(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 text-slate-200">
                                 <option value="standard">Standard Soil / Bare Surface (Threshold: 0.18 m³/m³)</option>
-                                <option value="mulched" selected>Raised Bed + Cardboard Mulch & Deep Roots (Threshold:
-                                    0.12 m³/m³)</option>
+                                <option value="mulched" selected>Raised Bed + Cardboard Mulch & Deep Roots (Threshold: 0.12 m³/m³)</option>
                             </select>
                         </div>
                     </div>
@@ -134,27 +119,23 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-
+            
             <!-- Sidebar Navigation -->
             <section class="lg:col-span-1 flex flex-col gap-6">
-
+                
                 <!-- Search -->
                 <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg">
-                    <h2
-                        class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-magnifying-glass-location text-blue-400"></i> Location Lookup
                     </h2>
-
+                    
                     <form onsubmit="handleSearchSubmit(event)" class="flex flex-col gap-3">
-                        <input type="text" id="location-query" placeholder="Canadian Postal Code, Address or Lat,Lon"
-                            class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+                        <input type="text" id="location-query" placeholder="Canadian Postal Code, Address or Lat,Lon" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
                         <div class="grid grid-cols-2 gap-2">
-                            <button type="submit"
-                                class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all">
                                 <i class="fa-solid fa-magnifying-glass"></i> Search
                             </button>
-                            <button type="button" onclick="getCurrentGPS()"
-                                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all">
+                            <button type="button" onclick="getCurrentGPS()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all">
                                 <i class="fa-solid fa-location-crosshairs text-teal-400"></i> Use GPS
                             </button>
                         </div>
@@ -162,19 +143,16 @@
                 </div>
 
                 <!-- Saved Locations -->
-                <div
-                    class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg flex-grow flex flex-col min-h-[220px]">
+                <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg flex-grow flex flex-col min-h-[220px]">
                     <div class="flex justify-between items-center mb-4">
-                        <h2
-                            class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
                             <i class="fa-solid fa-star text-yellow-500"></i> Saved Beds
                         </h2>
-                        <button id="favorite-current-btn" onclick="toggleCurrentFavorite()"
-                            class="hidden text-xs text-blue-400 hover:underline flex items-center gap-1">
+                        <button id="favorite-current-btn" onclick="toggleCurrentFavorite()" class="hidden text-xs text-blue-400 hover:underline flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> Save Active
                         </button>
                     </div>
-
+                    
                     <div id="favorites-list" class="space-y-2 overflow-y-auto max-h-[300px] flex-grow pr-1">
                         <div class="text-center py-8 text-slate-500 text-xs">
                             No saved locations.
@@ -187,47 +165,38 @@
             <section class="lg:col-span-3 flex flex-col gap-6">
 
                 <!-- Alert Box -->
-                <div id="alert-box"
-                    class="hidden bg-red-900/40 border border-red-700 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
+                <div id="alert-box" class="hidden bg-red-900/40 border border-red-700 text-red-200 px-4 py-3 rounded-xl text-sm flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                         <span id="alert-message">Error</span>
                     </div>
-                    <button onclick="hideAlert()" class="text-red-200 hover:text-white"><i
-                            class="fa-solid fa-xmark"></i></button>
+                    <button onclick="hideAlert()" class="text-red-200 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
                 <!-- Empty State Fallback -->
-                <div id="empty-dashboard-state"
-                    class="bg-cardBg border border-borderBg rounded-2xl p-12 text-center shadow-lg my-auto">
+                <div id="empty-dashboard-state" class="bg-cardBg border border-borderBg rounded-2xl p-12 text-center shadow-lg my-auto">
                     <i class="fa-solid fa-temperature-empty text-5xl text-slate-600 mb-4 animate-bounce"></i>
                     <h2 class="text-lg font-bold mb-1">Enter Raised Bed Location</h2>
                     <p class="text-slate-400 max-w-sm mx-auto text-xs mb-6">
-                        Enter a location or postal code to load weather forecasts, ground moisture conditions, and
-                        customized tomato irrigation schedules.
+                        Enter a location or postal code to load weather forecasts, ground moisture conditions, and customized tomato irrigation schedules.
                     </p>
-                    <button onclick="loadSampleLocation()"
-                        class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-lg text-xs font-semibold transition-all">
+                    <button onclick="loadSampleLocation()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 rounded-lg text-xs font-semibold transition-all">
                         Load Vancouver Demo (Raised Bed)
                     </button>
                 </div>
 
                 <!-- Active Dashboard View -->
                 <div id="active-dashboard" class="hidden space-y-6">
-
+                    
                     <!-- Dashboard Title Banner -->
-                    <div
-                        class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="bg-cardBg border border-borderBg rounded-xl p-5 shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active
-                                Monitoring Station</span>
+                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active Monitoring Station</span>
                             <h2 id="active-location-title" class="text-lg font-bold text-white mt-0.5">Surrey, BC</h2>
                             <p id="active-location-coords" class="text-xs text-slate-400">Lat: 49.104, Lon: -122.801</p>
                         </div>
                         <div class="flex items-center gap-2 self-stretch md:self-auto justify-end">
-                            <button onclick="refreshCurrentLocation()"
-                                class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-lg text-slate-300 transition-all"
-                                title="Force Refresh">
+                            <button onclick="refreshCurrentLocation()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-lg text-slate-300 transition-all" title="Force Refresh">
                                 <i class="fa-solid fa-rotate-right"></i>
                             </button>
                         </div>
@@ -236,25 +205,21 @@
                     <!-- WATERING ADVISOR INTELLIGENT CARD -->
                     <div id="advisor-card" class="border rounded-2xl p-6 shadow-xl transition-all">
                         <div class="flex items-start gap-4">
-                            <div id="advisor-icon-wrapper"
-                                class="p-3.5 rounded-xl text-white flex items-center justify-center">
+                            <div id="advisor-icon-wrapper" class="p-3.5 rounded-xl text-white flex items-center justify-center">
                                 <i id="advisor-icon" class="fa-solid text-2xl"></i>
                             </div>
                             <div class="flex-grow">
                                 <div class="flex flex-wrap items-center justify-between gap-2">
                                     <h3 class="font-bold text-base text-white">Tomato Watering Advisor</h3>
-                                    <span id="advisor-status-badge"
-                                        class="text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Loading...</span>
+                                    <span id="advisor-status-badge" class="text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider">Loading...</span>
                                 </div>
                                 <p id="advisor-description" class="text-sm mt-2 text-slate-300 leading-relaxed">
                                     Analyzing weather conditions and local metrics to generate irrigation guidance.
                                 </p>
                                 <!-- Predictor Line -->
-                                <div id="advisor-prediction-line"
-                                    class="mt-3 pt-3 border-t border-slate-700/50 flex items-center gap-2 text-xs font-semibold text-slate-300">
+                                <div id="advisor-prediction-line" class="mt-3 pt-3 border-t border-slate-700/50 flex items-center gap-2 text-xs font-semibold text-slate-300">
                                     <i class="fa-solid fa-calendar-days text-teal-400"></i>
-                                    <span>Calculated Irrigation Target: <strong id="predicted-date-text"
-                                            class="text-emerald-400 font-bold">Checking...</strong></span>
+                                    <span>Calculated Irrigation Target: <strong id="predicted-date-text" class="text-emerald-400 font-bold">Checking...</strong></span>
                                 </div>
                             </div>
                         </div>
@@ -262,12 +227,10 @@
 
                     <!-- Metrics Array -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                        <div
-                            class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
+                        
+                        <div class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
                             <div>
-                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">7-Day
-                                    Rainfall History</p>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">7-Day Rainfall History</p>
                                 <h3 id="metric-past-rain" class="text-xl font-bold text-blue-400 mt-1">0.0 mm</h3>
                                 <p class="text-[10px] text-slate-500">Natural precipitation total</p>
                             </div>
@@ -276,11 +239,9 @@
                             </div>
                         </div>
 
-                        <div
-                            class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
+                        <div class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
                             <div>
-                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">7-Day
-                                    Rainfall Forecast</p>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">7-Day Rainfall Forecast</p>
                                 <h3 id="metric-forecast-rain" class="text-xl font-bold text-orange-400 mt-1">0.0 mm</h3>
                                 <p id="metric-forecast-prob" class="text-[10px] text-slate-500">Max probability: 0%</p>
                             </div>
@@ -289,13 +250,10 @@
                             </div>
                         </div>
 
-                        <div
-                            class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
+                        <div class="bg-cardBg border border-borderBg rounded-xl p-4 shadow-md flex items-center justify-between">
                             <div>
-                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Current
-                                    Soil Moisture</p>
-                                <h3 id="metric-soil-moisture" class="text-xl font-bold text-emerald-400 mt-1">0.000 m³
-                                </h3>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wider">Current Soil Moisture</p>
+                                <h3 id="metric-soil-moisture" class="text-xl font-bold text-emerald-400 mt-1">0.000 m³</h3>
                                 <p id="metric-soil-status" class="text-[10px] text-slate-500">Analyzing depth</p>
                             </div>
                             <div class="bg-emerald-500/10 p-2.5 rounded-lg text-emerald-400">
@@ -310,21 +268,14 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                             <div>
                                 <h3 class="font-bold text-sm text-slate-200">Dynamic Multi-Variable Plot</h3>
-                                <p class="text-xs text-slate-400">Comparing rainfall levels, maximum ambient
-                                    temperature, and soil humidity trends</p>
+                                <p class="text-xs text-slate-400">Comparing rainfall levels, maximum ambient temperature, and soil humidity trends</p>
                             </div>
                             <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                                <span class="flex items-center gap-1.5"><span
-                                        class="w-3 h-3 bg-blue-500 rounded-sm"></span> Rain</span>
-                                <span class="flex items-center gap-1.5"><span
-                                        class="w-3 h-3 bg-cyan-500 rounded-sm"></span> Watered</span>
-                                <span class="flex items-center gap-1.5"><span
-                                        class="w-3 h-1 bg-emerald-500 inline-block"></span> Soil Moisture</span>
-                                <span class="flex items-center gap-1.5"><span
-                                        class="w-3 h-1 bg-red-500 inline-block"></span> Max Temp</span>
-                                <span class="flex items-center gap-1.5"><span
-                                        class="border-b-2 border-dashed border-red-500 w-4 inline-block"></span>
-                                    Predicted Target</span>
+                                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-500 rounded-sm"></span> Rain</span>
+                                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-cyan-500 rounded-sm"></span> Watered</span>
+                                <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-emerald-500 inline-block"></span> Soil Moisture</span>
+                                <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-red-500 inline-block"></span> Max Temp</span>
+                                <span class="flex items-center gap-1.5"><span class="border-b-2 border-dashed border-red-500 w-4 inline-block"></span> Predicted Target</span>
                             </div>
                         </div>
                         <div class="relative w-full h-[320px] md:h-[380px]">
@@ -337,16 +288,14 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                             <div>
                                 <h3 class="font-bold text-sm text-slate-200">Daily Log & Irrigation Inputs</h3>
-                                <p class="text-xs text-slate-400">Log manual watering events directly in this table to
-                                    feed the advisor algorithm</p>
+                                <p class="text-xs text-slate-400">Log manual watering events directly in this table to feed the advisor algorithm</p>
                             </div>
                         </div>
-
+                        
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-xs md:text-sm">
                                 <thead>
-                                    <tr
-                                        class="border-b border-slate-700 text-xs font-semibold text-slate-400 uppercase">
+                                    <tr class="border-b border-slate-700 text-xs font-semibold text-slate-400 uppercase">
                                         <th class="py-3 px-3">Date</th>
                                         <th class="py-3 px-3">Type</th>
                                         <th class="py-3 px-3">Precipitation</th>
@@ -372,8 +321,7 @@
     </main>
 
     <footer class="mt-12 border-t border-slate-800 py-6 text-center text-xs text-slate-500">
-        <p>© 2026 HydroTrack. Calibration parameters designed specifically for deep-rooted tomato beds with surface
-            evaporation barriers.</p>
+        <p>© 2026 HydroTrack. Calibration parameters designed specifically for deep-rooted tomato beds with surface evaporation barriers.</p>
     </footer>
 
     <!-- App Logic Execution -->
@@ -391,8 +339,8 @@
 
         // Soil profiles parameters
         const soilThresholds = {
-            standard: 0.18,
-            mulched: 0.12
+            standard: 0.18, 
+            mulched: 0.12   
         };
 
         let chartInstance = null;
@@ -401,15 +349,15 @@
         const verticalTargetLinePlugin = {
             id: 'verticalTargetLine',
             afterDatasetsDraw(chart, args, options) {
-                const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+                const {ctx, chartArea: {top, bottom}, scales: {x}} = chart;
                 const targetLabel = options.targetLabel; // Formatted date string to match labels
                 if (!targetLabel) return;
-
+                
                 const index = chart.data.labels.indexOf(targetLabel);
                 if (index === -1) return;
-
+                
                 const xPos = x.getPixelForValue(chart.data.labels[index]);
-
+                
                 ctx.save();
                 ctx.beginPath();
                 ctx.strokeStyle = '#ef4444'; // Red-500
@@ -418,7 +366,7 @@
                 ctx.moveTo(xPos, top);
                 ctx.lineTo(xPos, bottom);
                 ctx.stroke();
-
+                
                 // Draw Label Badge
                 ctx.fillStyle = '#ef4444';
                 ctx.font = 'bold 9px sans-serif';
@@ -584,8 +532,8 @@
         // Load Weather Data
         async function fetchAndRenderWeather(loc) {
             showLoadingState();
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&past_days=7&timezone=auto`;
-
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm,precipitation&past_days=7&timezone=auto`;
+            
             try {
                 const res = await fetch(url);
                 if (!res.ok) throw new Error("Could not download records");
@@ -601,13 +549,18 @@
         }
 
         function processWeatherData(data) {
-            const todayStr = getLocalDateString();
+            // Calculate EXACT local date using UTC offset to maintain consistent timelines
+            const localTimeAtLocation = new Date(Date.now() + (data.utc_offset_seconds * 1000));
+            const year = localTimeAtLocation.getUTCFullYear();
+            const month = String(localTimeAtLocation.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(localTimeAtLocation.getUTCDate()).padStart(2, '0');
+            const todayStr = `${year}-${month}-${day}`;
+
             const dailyDates = data.daily.time;
-            const rainSum = data.daily.precipitation_sum;
             const rainProb = data.daily.precipitation_probability_max;
             const tempMax = data.daily.temperature_2m_max;
 
-            // Average Hourly Soil Moisture to Daily
+            // 1. Average Hourly Soil Moisture to Daily
             const soilByDay = {};
             data.hourly.time.forEach((tStr, idx) => {
                 const datePart = tStr.substring(0, 10);
@@ -623,11 +576,28 @@
                 avgSoil[d] = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length) : 0;
             }
 
+            // 2. Sum Hourly Precipitation to Daily Totals (Stable Calculation)
+            const rainByDay = {};
+            data.hourly.time.forEach((tStr, idx) => {
+                const datePart = tStr.substring(0, 10);
+                if (!rainByDay[datePart]) rainByDay[datePart] = [];
+                if (data.hourly.precipitation[idx] !== null && data.hourly.precipitation[idx] !== undefined) {
+                    rainByDay[datePart].push(data.hourly.precipitation[idx]);
+                }
+            });
+
+            const dailyRainSum = {};
+            for (const d in rainByDay) {
+                const values = rainByDay[d];
+                dailyRainSum[d] = values.reduce((a, b) => a + b, 0); // Sum of all 24 hours
+            }
+
+            // 3. Assemble Daily Weather Dataset
             state.weatherData = dailyDates.map((date, idx) => {
                 return {
                     date: date,
                     isPast: date <= todayStr,
-                    rain: rainSum[idx] || 0,
+                    rain: dailyRainSum[date] || 0, // Stable hourly aggregation
                     prob: rainProb[idx] || 0,
                     tempMax: tempMax[idx] || 0,
                     soil: avgSoil[date] || 0
@@ -646,7 +616,8 @@
             const forecastRainTotal = state.weatherData.filter(d => !d.isPast).reduce((a, c) => a + c.rain, 0);
             const maxForecastProb = state.weatherData.filter(d => !d.isPast).reduce((a, c) => c.prob > a ? c.prob : a, 0);
 
-            const todayStr = getLocalDateString();
+            // Fetch state representation aligned with coordinate clock
+            const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
             const soilToday = state.weatherData.find(d => d.date === todayStr)?.soil || 0;
 
             document.getElementById('metric-past-rain').innerText = `${pastRainTotal.toFixed(1)} mm`;
@@ -677,7 +648,7 @@
 
         // PREDICTIVE TARGET ALGORITHM
         function calculatePredictedWateringDate() {
-            const todayStr = getLocalDateString();
+            const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
             const locId = state.activeLocation.id;
             const log = state.wateredLog[locId] || {};
             const criticalThresh = soilThresholds[state.soilProfile];
@@ -690,7 +661,7 @@
                 const dateCheck = new Date();
                 dateCheck.setDate(dateCheck.getDate() - i);
                 const checkStr = dateCheck.toLocaleDateString('en-CA');
-
+                
                 if (log[checkStr] && log[checkStr] !== 'none') {
                     lastWaterDate = new Date(dateCheck);
                     if (log[checkStr] === 'heavy') protectionDays = 4;
@@ -739,7 +710,7 @@
 
         // WATERING ADVISOR ENGINE
         function runWateringAdvisor() {
-            const todayStr = getLocalDateString();
+            const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
             const locId = state.activeLocation.id;
             const log = state.wateredLog[locId] || {};
             const criticalThresh = soilThresholds[state.soilProfile];
@@ -748,11 +719,11 @@
             let wateringImpactType = '';
             let wateringImpactAge = 0;
 
-            const daysToCheck = [0, 1, 2, 3];
+            const daysToCheck = [0, 1, 2, 3]; 
             const dateObjs = daysToCheck.map(offset => {
                 const d = new Date();
                 d.setDate(d.getDate() - offset);
-                return d.toLocaleDateString('en-CA');
+                return d.toLocaleDateString('en-CA'); 
             });
 
             for (let i = 0; i < 4; i++) {
@@ -785,14 +756,14 @@
 
             const upcomingRain = state.weatherData
                 .filter(d => !d.isPast && d.date > todayStr)
-                .slice(0, 2);
+                .slice(0, 2); 
             const totalUpcomingRain = upcomingRain.reduce((a, c) => a + c.rain, 0);
             const maxUpcomingProb = upcomingRain.reduce((a, c) => c.prob > a ? c.prob : a, 0);
             const incomingHeavyRain = totalUpcomingRain >= 5.0 && maxUpcomingProb >= 50;
 
             const upcomingHeat = state.weatherData
                 .filter(d => d.date >= todayStr)
-                .slice(0, 3);
+                .slice(0, 3); 
             const maxUpcomingTemp = upcomingHeat.reduce((a, c) => c.tempMax > a ? c.tempMax : a, 0);
             const highHeatIncoming = maxUpcomingTemp >= 27.0;
 
@@ -802,7 +773,7 @@
 
             // Populate visual recommendation descriptions
             const desc = document.getElementById('advisor-description');
-
+            
             if (wateringProtectionActive) {
                 setAdvisorUi('neutral', 'Hold Off', `You logged a ${wateringImpactType} watering event ${wateringImpactAge === 0 ? 'today' : wateringImpactAge + ' day(s) ago'}. Combined with your cardboard mulch, this water is insulated at the lower root zone. Skip watering to avoid waterlogged soil.`);
             } else if (incomingHeavyRain) {
@@ -876,7 +847,7 @@
             tbody.innerHTML = '';
             const locKey = state.activeLocation.id;
             const log = state.wateredLog[locKey] || {};
-            const todayStr = getLocalDateString();
+            const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
 
             state.weatherData.forEach(day => {
                 const formattedDate = parseAndFormatDateString(day.date);
@@ -885,7 +856,7 @@
 
                 const tr = document.createElement('tr');
                 tr.className = `border-b border-slate-800 hover:bg-slate-800/40 transition-all ${day.date === todayStr ? 'bg-blue-950/20' : ''} ${isTargetDate ? 'bg-red-950/10' : ''}`;
-
+                
                 tr.innerHTML = `
                     <td class="py-3 px-3 font-semibold ${day.date === todayStr ? 'text-emerald-400' : ''} ${isTargetDate ? 'text-red-400' : ''}">
                         ${formattedDate} 
@@ -927,7 +898,7 @@
             }
 
             localStorage.setItem('watered_log_multi', JSON.stringify(state.wateredLog));
-
+            
             // Instantly update targets and state logic
             calculatePredictedWateringDate();
             runWateringAdvisor();
@@ -948,14 +919,14 @@
 
             const locId = state.activeLocation.id;
             const log = state.wateredLog[locId] || {};
-            const todayStr = getLocalDateString();
+            const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
 
             const barBgColors = rawDates.map(d => {
                 const water = log[d];
-                if (water === 'heavy') return 'rgba(6, 182, 212, 0.9)';
-                if (water === 'medium') return 'rgba(6, 182, 212, 0.6)';
-                if (water === 'light') return 'rgba(6, 182, 212, 0.35)';
-                return d <= todayStr ? 'rgba(59, 130, 246, 0.55)' : 'rgba(249, 115, 22, 0.45)';
+                if (water === 'heavy') return 'rgba(6, 182, 212, 0.9)';   
+                if (water === 'medium') return 'rgba(6, 182, 212, 0.6)';  
+                if (water === 'light') return 'rgba(6, 182, 212, 0.35)';  
+                return d <= todayStr ? 'rgba(59, 130, 246, 0.55)' : 'rgba(249, 115, 22, 0.45)'; 
             });
 
             const barBorderColors = rawDates.map(d => {
@@ -1044,7 +1015,7 @@
                             position: 'right',
                             title: { display: false },
                             grid: { drawOnChartArea: false },
-                            ticks: { display: false },
+                            ticks: { display: false }, 
                             suggestedMin: 5,
                             suggestedMax: 35
                         }
@@ -1056,7 +1027,7 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: function (context) {
+                                label: function(context) {
                                     let label = context.dataset.label || '';
                                     if (label) label += ': ';
                                     if (context.parsed.y !== null) {
@@ -1105,8 +1076,9 @@
             state.favorites.forEach(fav => {
                 const isActive = state.activeLocation && state.activeLocation.id === fav.id;
                 const div = document.createElement('div');
-                div.className = `group flex justify-between items-center p-2.5 rounded-lg text-xs cursor-pointer border transition-all ${isActive ? 'bg-emerald-600/10 border-emerald-500/50 text-emerald-300' : 'bg-slate-900/50 hover:bg-slate-800 border-slate-800 text-slate-300'
-                    }`;
+                div.className = `group flex justify-between items-center p-2.5 rounded-lg text-xs cursor-pointer border transition-all ${
+                    isActive ? 'bg-emerald-600/10 border-emerald-500/50 text-emerald-300' : 'bg-slate-900/50 hover:bg-slate-800 border-slate-800 text-slate-300'
+                }`;
                 div.innerHTML = `
                     <div onclick="selectFavorite('${fav.id}')" class="flex-grow font-semibold truncate pr-2">
                         <i class="fa-solid fa-seedling mr-1.5 text-emerald-500"></i> ${fav.name}
@@ -1201,5 +1173,4 @@
         }
     </script>
 </body>
-
 </html>
