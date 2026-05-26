@@ -532,7 +532,8 @@
         // Load Weather Data
         async function fetchAndRenderWeather(loc) {
             showLoadingState();
-            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm,precipitation&past_days=7&timezone=auto`;
+            // Reverted directly back to daily=precipitation_sum, matching the Discord bot exactly
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&past_days=7&timezone=auto`;
             
             try {
                 const res = await fetch(url);
@@ -557,6 +558,7 @@
             const todayStr = `${year}-${month}-${day}`;
 
             const dailyDates = data.daily.time;
+            const rainSum = data.daily.precipitation_sum;
             const rainProb = data.daily.precipitation_probability_max;
             const tempMax = data.daily.temperature_2m_max;
 
@@ -576,28 +578,12 @@
                 avgSoil[d] = values.length > 0 ? (values.reduce((a, b) => a + b, 0) / values.length) : 0;
             }
 
-            // 2. Sum Hourly Precipitation to Daily Totals (Stable Calculation)
-            const rainByDay = {};
-            data.hourly.time.forEach((tStr, idx) => {
-                const datePart = tStr.substring(0, 10);
-                if (!rainByDay[datePart]) rainByDay[datePart] = [];
-                if (data.hourly.precipitation[idx] !== null && data.hourly.precipitation[idx] !== undefined) {
-                    rainByDay[datePart].push(data.hourly.precipitation[idx]);
-                }
-            });
-
-            const dailyRainSum = {};
-            for (const d in rainByDay) {
-                const values = rainByDay[d];
-                dailyRainSum[d] = values.reduce((a, b) => a + b, 0); // Sum of all 24 hours
-            }
-
-            // 3. Assemble Daily Weather Dataset
+            // 2. Assemble Daily Weather Dataset using the daily precipitation sum
             state.weatherData = dailyDates.map((date, idx) => {
                 return {
                     date: date,
                     isPast: date <= todayStr,
-                    rain: dailyRainSum[date] || 0, // Stable hourly aggregation
+                    rain: rainSum[idx] || 0, // Direct daily aggregation matching your bot snippet
                     prob: rainProb[idx] || 0,
                     tempMax: tempMax[idx] || 0,
                     soil: avgSoil[date] || 0
