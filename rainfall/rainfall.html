@@ -549,7 +549,8 @@
             const endDate = getISOString(yesterdayObj);
 
             // Parallel Blending: Fetch guaranteed historical archive & standard future forecast in tandem
-            const archiveUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lon}&start_date=${startDate}&end_date=${endDate}&daily=precipitation_sum,temperature_2m_max&hourly=soil_moisture_3_to_9cm&timezone=auto`;
+            // FIXED: Requested 'soil_moisture_0_to_7cm' for the reanalysis archive to prevent 0-value gaps
+            const archiveUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lon}&start_date=${startDate}&end_date=${endDate}&daily=precipitation_sum,temperature_2m_max&hourly=soil_moisture_0_to_7cm&timezone=auto`;
             const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&timezone=auto`;
             
             try {
@@ -590,8 +591,9 @@
             archive.hourly.time.forEach((tStr, idx) => {
                 const datePart = tStr.substring(0, 10);
                 if (!archiveSoilByDay[datePart]) archiveSoilByDay[datePart] = [];
-                if (archive.hourly.soil_moisture_3_to_9cm[idx] !== null) {
-                    archiveSoilByDay[datePart].push(archive.hourly.soil_moisture_3_to_9cm[idx]);
+                // FIXED: Map 'soil_moisture_0_to_7cm' for correct reanalysis retrieval
+                if (archive.hourly.soil_moisture_0_to_7cm && archive.hourly.soil_moisture_0_to_7cm[idx] !== null && archive.hourly.soil_moisture_0_to_7cm[idx] !== undefined) {
+                    archiveSoilByDay[datePart].push(archive.hourly.soil_moisture_0_to_7cm[idx]);
                 }
             });
 
@@ -1105,6 +1107,7 @@
             updateFavoriteButtonState();
         }
 
+        // Render Favorites Sidebar list
         function renderFavorites() {
             const container = document.getElementById('favorites-list');
             container.innerHTML = '';
@@ -1187,7 +1190,6 @@
             });
         }
 
-        // Error message visual controllers
         function showAlert(message) {
             const box = document.getElementById('alert-box');
             document.getElementById('alert-message').innerText = message;
