@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spice Jar Label Generator</title>
+  <style>
+    /* Design Variables */
+    :root {
+      --primary: #2d3748;
+      --primary-hover: #1a202c;
+      --bg: #f7fafc;
+      --panel-bg: #ffffff;
+      --border-color: #e2e8f0;
+      
+      /* Print Variables (manipulated via JS) */
+      --label-width: 3.0in;
+      --label-height: 3.0in;
+
+      /* Font Scaling Variables (manipulated via JS sliders) */
+      --title-scale: 1.0;
+      --subtitle-scale: 1.0;
+      --footnote-scale: 1.0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--primary);
+      line-height: 1.5;
+      padding: 20px;
+    }
+
+    /* Layout Wrapper */
+    .app-container {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Configuration Sidebar */
+    .sidebar {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    h1 {
+      font-size: 1.35rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 1rem;
+      margin: 20px 0 10px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: #718096;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4a5568;
+    }
+
+    .scale-val {
+      font-size: 0.8rem;
+      color: #718096;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background-color: #fff;
+      color: var(--primary);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #a0aec0;
+    }
+
+    .dimension-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      transition: background-color 0.15s ease;
+      margin-top: 10px;
+    }
+
+    .btn-primary {
+      background-color: #2b6cb0;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #2b5c8f;
+    }
+
+    .btn-secondary {
+      background-color: #edf2f7;
+      color: #4a5568;
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+    }
+
+    .btn-danger {
+      background-color: #fff5f5;
+      color: #c53030;
+      border: 1px solid #feb2b2;
+    }
+
+    .btn-danger:hover {
+      background-color: #fed7d7;
+    }
+
+    /* Main Board Display */
+    .main-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .preview-section {
+      background: white;
+      border: 1px dashed #cbd5e0;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .preview-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #718096;
+      margin-bottom: 10px;
+    }
+
+    /* Active Grid Sheet */
+    .sheet-section {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 25px;
+      min-height: 500px;
+    }
+
+    .sheet-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: flex-start;
+    }
+
+    /* ========================================================= */
+    /* COLOR THEME CONTROLLERS                                   */
+    /* ========================================================= */
+    .color-default { --theme-color: #111111; }
+    .color-forest { --theme-color: #1b4327; }      
+    .color-terracotta { --theme-color: #a04e33; }  
+    .color-navy { --theme-color: #1a365d; }        
+
+    /* ========================================================= */
+    /* LABEL CARD STYLING                                        */
+    /* ========================================================= */
+    .label-card {
+      width: var(--label-width);
+      height: var(--label-height);
+      background: white;
+      border: 1px solid var(--theme-color);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.25in;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+      background-color: #ffffff;
+      color: var(--theme-color);
+    }
+
+    /* Active Editing State styling (screen only) */
+    @media screen {
+      .sheet-grid .label-card {
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      }
+      .sheet-grid .label-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+      }
+      .sheet-grid .label-card.is-editing {
+        outline: 2px solid #2b6cb0;
+        outline-offset: 2px;
+        box-shadow: 0 0 12px rgba(43, 108, 176, 0.3);
+      }
+    }
+
+    /* Faint delete button overlay on hover in web interface */
+    .label-card .delete-overlay {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(220, 53, 69, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      z-index: 10;
+    }
+
+    .label-card:hover .delete-overlay {
+      display: flex;
+    }
+
+    /* Vector Graphic wrapper */
+    .label-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.05in;
+    }
+
+    .label-icon svg {
+      width: 0.45in;
+      height: 0.45in;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+    }
+
+    .label-text-container {
+      text-align: center;
+      width: 100%;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .label-title {
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+
+    .label-subtitle {
+      font-weight: 400;
+      line-height: 1.3;
+      margin-top: 0.03in;
+    }
+
+    .label-footnote {
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border-top: 1px solid var(--theme-color);
+      opacity: 0.9;
+      padding-top: 0.04in;
+      width: 100%;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    /* ========================================================= */
+    /* THEMES (All adapting dynamically to scales & colors)      */
+    /* ========================================================= */
+    
+    /* 1. Minimalist Modern */
+    .theme-minimal {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      border: 1px solid var(--theme-color);
+    }
+    .theme-minimal .label-title {
+      font-size: calc(0.22in * var(--title-scale));
+      font-weight: 500;
+      letter-spacing: 0.08em;
+    }
+    .theme-minimal .label-subtitle {
+      font-size: calc(0.13in * var(--subtitle-scale));
+      font-style: italic;
+      opacity: 0.75;
+    }
+    .theme-minimal .label-footnote {
+      font-size: calc(0.10in * var(--footnote-scale));
+      opacity: 0.7;
+      border-top: 1px solid var(--theme-color);
+    }
+
+    /* 2. Vintage Apothecary */
+    .theme-vintage {
+      font-family: "Georgia", "Times New Roman", serif;
+      border: 4px double var(--theme-color);
+    }
+    .theme-vintage::before {
+      content: "";
+      position: absolute;
+      top: 3px; left: 3px; right: 3px; bottom: 3px;
+      border: 1px solid var(--theme-color);
+      pointer-events: none;
+    }
+    .theme-vintage .label-title {
+      font-size: calc(0.24in * var(--title-scale));
+      letter-spacing: 0.03em;
+      border-bottom: 1px solid var(--theme-color);
+      padding-bottom: 2px;
+      display: inline-block;
+      margin: 0 auto;
+    }
+    .theme-vintage .label-subtitle {
+      font-size: calc(0.14in * var(--subtitle-scale));
+      font-style: italic;
+      margin-top: 6px;
+      opacity: 0.8;
+    }
+    .theme-vintage .label-footnote {
+      font-size: calc(0.11in * var(--footnote-scale));
+      border-top: 1px double var(--theme-color);
+    }
+
+    /* 3. Bold Chef */
+    .theme-bold {
+      font-family: "Impact", "Arial Black", sans-serif;
+      border: 3px solid var(--theme-color);
+    }
+    .theme-bold .label-title {
+      font-size: calc(0.28in * var(--title-scale));
+      letter-spacing: 0.02em;
+      transform: scaleY(1.1);
+    }
+    .theme-bold .label-subtitle {
+      font-family: sans-serif;
+      font-weight: bold;
+      font-size: calc(0.12in * var(--subtitle-scale));
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.8;
+    }
+    .theme-bold .label-footnote {
+      font-family: sans-serif;
+      font-size: calc(0.11in * var(--footnote-scale));
+      font-weight: 800;
+      background: var(--theme-color);
+      color: #ffffff !important;
+      margin-left: -0.25in;
+      margin-right: -0.25in;
+      margin-bottom: -0.25in;
+      padding: 0.05in 0;
+      opacity: 1;
+    }
+
+    /* 4. Rustic Border */
+    .theme-rustic {
+      font-family: "Georgia", serif;
+      border: 1.5px dashed var(--theme-color);
+    }
+    .theme-rustic .label-title {
+      font-size: calc(0.22in * var(--title-scale));
+      letter-spacing: 0.04em;
+    }
+    .theme-rustic .label-subtitle {
+      font-size: calc(0.13in * var(--subtitle-scale));
+      opacity: 0.8;
+    }
+    .theme-rustic .label-footnote {
+      font-size: calc(0.11in * var(--footnote-scale));
+      border-top: 1.5px dashed var(--theme-color);
+    }
+
+    /* ========================================================= */
+    /* PRINT STYLING                                             */
+    /* ========================================================= */
+    @media print {
+      body, .app-container, .sidebar, .preview-section, .preview-title, .delete-overlay, h1, h2, .sheet-section h2 {
+        background: white !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .sidebar, .preview-section, .instructions, .sidebar-buttons {
+        display: none !important;
+      }
+
+      .app-container {
+        display: block !important;
+      }
+
+      .sheet-section {
+        border: none !important;
+        padding: 0 !important;
+      }
+
+      .sheet-grid {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0.15in !important; 
+        justify-content: flex-start !important;
+        padding: 0.2in !important;
+      }
+
+      .label-card {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        border: 1px dotted var(--theme-color) !important;
+        box-shadow: none !important;
+      }
+      
+      .theme-vintage {
+        border: 4px double var(--theme-color) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Left Configuration Sidebar -->
+    <div class="sidebar no-print">
+      <h1>Spice Label Maker</h1>
+      <p style="font-size:0.8rem; color:#718096; margin-bottom:15px;">
+        Optimized for 16oz (454g) glass jars. Recommended size is 3.0" x 3.0".
+      </p>
+
+      <div class="form-group">
+        <label for="spice-name">Spice Name</label>
+        <input type="text" id="spice-name" value="Oregano" placeholder="e.g., Oregano">
+      </div>
+
+      <div class="form-group">
+        <label for="spice-subtitle">Subtitle / Botanical Name</label>
+        <input type="text" id="spice-subtitle" value="Origanum vulgare" placeholder="e.g., Origanum vulgare">
+      </div>
+
+      <div class="form-group">
+        <label for="spice-footnote">Footnote Info</label>
+        <input type="text" id="spice-footnote" value="SAVORY & EARTHY • WHOLE LEAF" placeholder="e.g., Batch 12 • Product of Spain">
+      </div>
+
+      <h2>Label Dimensions</h2>
+      <div class="form-group dimension-inputs">
+        <div>
+          <label for="label-width">Width (inches)</label>
+          <input type="number" id="label-width-input" value="3.0" step="0.1" min="1" max="11">
+        </div>
+        <div>
+          <label for="label-height">Height (inches)</label>
+          <input type="number" id="label-height-input" value="3.0" step="0.1" min="1" max="11">
+        </div>
+      </div>
+
+      <h2>Font Scaling</h2>
+      <div class="form-group">
+        <div class="form-row">
+          <label for="scale-title">Spice Name Size</label>
+          <span id="val-scale-title" class="scale-val">100%</span>
+        </div>
+        <input type="range" id="scale-title" min="0.5" max="1.8" step="0.05" value="1.0">
+      </div>
+
+      <div class="form-group">
+        <div class="form-row">
+          <label for="scale-subtitle">Subtitle Size</label>
+          <span id="val-scale-subtitle" class="scale-val">100%</span>
+        </div>
+        <input type="range" id="scale-subtitle" min="0.5" max="1.8" step="0.05" value="1.0">
+      </div>
+
+      <div class="form-group">
+        <div class="form-row">
+          <label for="scale-footnote">Footnote Size</label>
+          <span id="val-scale-footnote" class="scale-val">100%</span>
+        </div>
+        <input type="range" id="scale-footnote" min="0.5" max="1.8" step="0.05" value="1.0">
+      </div>
+
+      <h2>Style Options</h2>
+      <div class="form-group">
+        <label for="style-theme">Design Theme</label>
+        <select id="style-theme">
+          <option value="theme-minimal">Minimalist Modern</option>
+          <option value="theme-vintage" selected>Classic Apothecary</option>
+          <option value="theme-bold">Bold Chef</option>
+          <option value="theme-rustic">Rustic Border</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="color-scheme">Color Option</label>
+        <select id="color-scheme">
+          <option value="color-default">Standard Ink (Black)</option>
+          <option value="color-forest" selected>Forest Green</option>
+          <option value="color-terracotta">Warm Terracotta</option>
+          <option value="color-navy">Royal Navy</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="style-icon">Central Icon</label>
+        <select id="style-icon">
+          <option value="leaf" selected>Herb Leaf</option>
+          <option value="pepper">Chili Pepper</option>
+          <option value="garlic">Garlic Bulb</option>
+          <option value="star">Star Anise</option>
+          <option value="mortar">Mortar & Pestle</option>
+          <option value="initial">First Letter (Dynamic)</option>
+          <option value="none">No Icon</option>
+        </select>
+      </div>
+
+      <div class="sidebar-buttons">
+        <button class="btn btn-primary" id="btn-add">Add Label to Page</button>
+        <button class="btn btn-secondary" id="btn-cancel-edit" style="display: none; background-color: #cbd5e0; color: #2d3748;">Cancel Edit</button>
+        <button class="btn btn-secondary" id="btn-print">Print Sheet</button>
+        <button class="btn btn-danger" id="btn-clear" style="margin-top: 30px;">Clear All Labels</button>
+      </div>
+    </div>
+
+    <!-- Right Panels (Work Area) -->
+    <div class="main-panel">
+      
+      <!-- Real-time Preview Pane -->
+      <div class="preview-section no-print">
+        <div class="preview-title">Real-Time Design Preview</div>
+        <div style="display: flex; justify-content: center; background: #edf2f7; padding: 20px; border-radius: 6px;">
+          <!-- Active Preview Card Target -->
+          <div id="live-preview-target"></div>
+        </div>
+      </div>
+
+      <!-- Active Print Sheet -->
+      <div class="sheet-section">
+        <h2 class="no-print" style="margin-bottom: 15px; border-bottom: 1px solid var(--border-color); padding-bottom:5px;">
+          Your Print Sheet
+        </h2>
+        <div class="sheet-grid" id="sheet-grid">
+          <!-- Labels generated by user will construct here -->
+        </div>
+      </div>
+      
+    </div>
+
+  </div>
+
+  <!-- SVG Icon Library Definitions -->
+  <div id="svg-library" style="display:none;">
+    <!-- Leaf -->
+    <svg id="svg-leaf" viewBox="0 0 24 24">
+      <path d="M2 22C2 22 6 18 12 18C18 18 22 22 22 22" stroke-linecap="round"/>
+      <path d="M12 2C6 7 4 13 4 18C10 18 16 16 20 11C20 6 17 2 12 2Z" fill="currentColor" fill-opacity="0.08" stroke-linejoin="round"/>
+      <path d="M12 2V18" stroke-linecap="round"/>
+    </svg>
+    <!-- Pepper -->
+    <svg id="svg-pepper" viewBox="0 0 24 24">
+      <path d="M12 2C11.5 3 11 4.5 11 6C11 8 13 10 12 13C10.5 15.2 6 16.5 5 20C4 23.5 8 23 11 21C15 18.5 18 16 19 12C20 8 17.5 5 15 4C14 3.6 13 2.5 12 2Z" fill="currentColor" fill-opacity="0.08" stroke-linejoin="round"/>
+      <path d="M12 6C13 4 14.5 3 16 3" stroke-linecap="round"/>
+    </svg>
+    <!-- Garlic -->
+    <svg id="svg-garlic" viewBox="0 0 24 24">
+      <path d="M12 2V6M12 22C16.5 22 20 18.5 20 14C20 10 17 8 12 6C7 8 4 10 4 14C4 18.5 7.5 22 12 22Z" fill="currentColor" fill-opacity="0.08" stroke-linejoin="round"/>
+      <path d="M8 10C8 15 10 21.5 12 22C14 21.5 16 15 16 10" stroke-linecap="round"/>
+    </svg>
+    <!-- Star Anise -->
+    <svg id="svg-star" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      <path d="M12 2V10M12 14V22M2 12H10M14 12H22M5 5L10.5 10.5M13.5 13.5L19 19M19 5L13.5 10.5M10.5 13.5L5 19" stroke-linecap="round"/>
+    </svg>
+    <!-- Mortar & Pestle -->
+    <svg id="svg-mortar" viewBox="0 0 24 24">
+      <path d="M4 10C4 15 6 19 12 19C18 19 20 15 20 10H4Z" fill="currentColor" fill-opacity="0.08" stroke-linejoin="round"/>
+      <path d="M18 4L13 10" stroke-linecap="round" stroke-width="2"/>
+      <path d="M2 10H22M6 19H18" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <script>
+    // State Variable to monitor which label is actively being edited
+    let editingId = null;
+
+    // Local Array pre-populated with user-suggested spices
+    let labelCollection = [
+      // Forest Green Spices
+      { id: 1, name: "Oregano", subtitle: "Origanum vulgare", footnote: "SAVORY & EARTHY • WHOLE LEAF", theme: "theme-vintage", color: "color-forest", icon: "leaf" },
+      { id: 2, name: "Basil", subtitle: "Ocimum basilicum", footnote: "SWEET & PEPPERY • ORGANIC", theme: "theme-minimal", color: "color-forest", icon: "leaf" },
+      { id: 3, name: "Thyme", subtitle: "Thymus vulgaris", footnote: "WOODS & FLORAL • FRENCH", theme: "theme-rustic", color: "color-forest", icon: "leaf" },
+      { id: 4, name: "Sage", subtitle: "Salvia officinalis", footnote: "PINE & CITRUS • RUBBED", theme: "theme-vintage", color: "color-forest", icon: "leaf" },
+      { id: 5, name: "Dried Kale", subtitle: "Brassica oleracea", footnote: "EARTHY & GREENS • FLAKES", theme: "theme-minimal", color: "color-forest", icon: "leaf" },
+
+      // Warm Terracotta Spices
+      { id: 6, name: "Nutmeg", subtitle: "Myristica fragrans", footnote: "WARM & AROMATIC • WHOLE", theme: "theme-vintage", color: "color-terracotta", icon: "star" },
+      { id: 7, name: "Curry Powder", subtitle: "Spice Blend", footnote: "BOLD & COMPLEX • MADRAS", theme: "theme-bold", color: "color-terracotta", icon: "mortar" },
+      { id: 8, name: "Turmeric", subtitle: "Curcuma longa", footnote: "EARTHY & BITTER • GROUND", theme: "theme-minimal", color: "color-terracotta", icon: "mortar" },
+      { id: 9, name: "Cumin", subtitle: "Cuminum cyminum", footnote: "WARM & EARTHY • GROUND", theme: "theme-vintage", color: "color-terracotta", icon: "mortar" },
+      { id: 10, name: "Taki Spice Mix", subtitle: "Custom Blend", footnote: "TANGY & FIERY • HOT CHILI", theme: "theme-bold", color: "color-terracotta", icon: "pepper" },
+
+      // Royal Navy Spices
+      { id: 11, name: "Coriander", subtitle: "Coriandrum sativum", footnote: "CITRUS & SPICY • GROUND", theme: "theme-vintage", color: "color-navy", icon: "leaf" },
+      { id: 12, name: "Cardamom", subtitle: "Elettaria cardamomum", footnote: "SWEET & HERBAL • PODS", theme: "theme-vintage", color: "color-navy", icon: "star" },
+      { id: 13, name: "Sesame Seed", subtitle: "Sesamum indicum", footnote: "NUTTY & TOASTED • WHOLE", theme: "theme-minimal", color: "color-navy", icon: "star" },
+
+      // Black Spices
+      { id: 14, name: "Onion Powder", subtitle: "Allium cepa", footnote: "SHARP & SAVORY • GROUND", theme: "theme-vintage", color: "color-default", icon: "garlic" }
+    ];
+
+    // DOM selectors
+    const inputName = document.getElementById('spice-name');
+    const inputSubtitle = document.getElementById('spice-subtitle');
+    const inputFootnote = document.getElementById('spice-footnote');
+    const inputWidth = document.getElementById('label-width-input');
+    const inputHeight = document.getElementById('label-height-input');
+    const selectTheme = document.getElementById('style-theme');
+    const selectColor = document.getElementById('color-scheme');
+    const selectIcon = document.getElementById('style-icon');
+
+    // Font Scaling DOM selectors
+    const scaleTitle = document.getElementById('scale-title');
+    const scaleSubtitle = document.getElementById('scale-subtitle');
+    const scaleFootnote = document.getElementById('scale-footnote');
+    const valTitle = document.getElementById('val-scale-title');
+    const valSubtitle = document.getElementById('val-scale-subtitle');
+    const valFootnote = document.getElementById('val-scale-footnote');
+    
+    const previewContainer = document.getElementById('live-preview-target');
+    const gridContainer = document.getElementById('sheet-grid');
+    const btnAdd = document.getElementById('btn-add');
+    const btnCancelEdit = document.getElementById('btn-cancel-edit');
+    const btnPrint = document.getElementById('btn-print');
+    const btnClear = document.getElementById('btn-clear');
+
+    // Setup Event Listeners
+    [inputName, inputSubtitle, inputFootnote, selectTheme, selectColor, selectIcon].forEach(el => {
+      el.addEventListener('input', updateRealTimePreview);
+    });
+
+    inputWidth.addEventListener('input', updatePhysicalDimensions);
+    inputHeight.addEventListener('input', updatePhysicalDimensions);
+
+    // Font Scaling Event Listeners
+    [scaleTitle, scaleSubtitle, scaleFootnote].forEach(slider => {
+      slider.addEventListener('input', updateFontScaling);
+    });
+
+    // Form submission (Add or Edit saving mechanism)
+    btnAdd.addEventListener('click', () => {
+      const nameVal = inputName.value.trim() || "Generic Spice";
+      const subtitleVal = inputSubtitle.value.trim();
+      const footnoteVal = inputFootnote.value.trim();
+      const themeVal = selectTheme.value;
+      const colorVal = selectColor.value;
+      const iconVal = selectIcon.value;
+
+      if (editingId !== null) {
+        // Find existing record and update it
+        const index = labelCollection.findIndex(item => item.id === editingId);
+        if (index !== -1) {
+          labelCollection[index] = {
+            ...labelCollection[index],
+            name: nameVal,
+            subtitle: subtitleVal,
+            footnote: footnoteVal,
+            theme: themeVal,
+            color: colorVal,
+            icon: iconVal
+          };
+        }
+        exitEditMode();
+      } else {
+        // Create dynamic new object
+        const newLabel = {
+          id: Date.now(),
+          name: nameVal,
+          subtitle: subtitleVal,
+          footnote: footnoteVal,
+          theme: themeVal,
+          color: colorVal,
+          icon: iconVal
+        };
+        labelCollection.push(newLabel);
+      }
+      renderSheetGrid();
+    });
+
+    btnCancelEdit.addEventListener('click', exitEditMode);
+
+    btnClear.addEventListener('click', () => {
+      if(confirm("Are you sure you want to clear your current sheet of labels?")) {
+        labelCollection = [];
+        exitEditMode();
+        renderSheetGrid();
+      }
+    });
+
+    btnPrint.addEventListener('click', () => {
+      window.print();
+    });
+
+    // Load selected label's variables back to sidebar
+    function startEditing(id) {
+      const label = labelCollection.find(item => item.id === id);
+      if (!label) return;
+
+      editingId = id;
+
+      // Populate input elements
+      inputName.value = label.name;
+      inputSubtitle.value = label.subtitle;
+      inputFootnote.value = label.footnote;
+      selectTheme.value = label.theme;
+      selectColor.value = label.color;
+      selectIcon.value = label.icon;
+
+      // Swap context buttons
+      btnAdd.innerText = "Save Changes";
+      btnCancelEdit.style.display = "block";
+
+      // Re-render components to apply borders and outlines
+      updateRealTimePreview();
+      renderSheetGrid();
+    }
+
+    // Clean out values and reset back to standard creation mode
+    function exitEditMode() {
+      editingId = null;
+
+      // Reset values back to generic starter values
+      inputName.value = "Oregano";
+      inputSubtitle.value = "Origanum vulgare";
+      inputFootnote.value = "SAVORY & EARTHY • WHOLE LEAF";
+      selectTheme.value = "theme-vintage";
+      selectColor.value = "color-forest";
+      selectIcon.value = "leaf";
+
+      // Revert buttons
+      btnAdd.innerText = "Add Label to Page";
+      btnCancelEdit.style.display = "none";
+
+      updateRealTimePreview();
+      renderSheetGrid();
+    }
+
+    // Extract raw SVG markup helper
+    function getIconMarkup(iconName, firstLetter = "S") {
+      if (iconName === "none") return "";
+      if (iconName === "initial") {
+        return `<div style="width: 0.45in; height: 0.45in; border: 1.5px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.22in; font-family: serif;">${firstLetter.toUpperCase()}</div>`;
+      }
+      const svgSource = document.getElementById(`svg-${iconName}`);
+      if (svgSource) {
+        return svgSource.outerHTML;
+      }
+      return "";
+    }
+
+    // Build raw card DOM
+    function constructLabelElement(data, isPreview = false) {
+      const card = document.createElement('div');
+      card.className = `label-card ${data.theme} ${data.color}`;
+      
+      // Highlight element if it is actively undergoing modifications
+      if (!isPreview) {
+        card.onclick = () => {
+          startEditing(data.id);
+        };
+
+        if (editingId === data.id) {
+          card.classList.add('is-editing');
+        }
+
+        // Delete button overlay setup
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-overlay';
+        deleteBtn.innerHTML = '&times;';
+        deleteBtn.title = "Delete Label";
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation(); // Stop click from bubbling up and starting edit mode
+          deleteLabel(data.id);
+        };
+        card.appendChild(deleteBtn);
+      }
+
+      // Graphic Icon component
+      const firstLetter = data.name ? data.name.charAt(0) : "S";
+      const iconMarkup = getIconMarkup(data.icon, firstLetter);
+      if (iconMarkup) {
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'label-icon';
+        iconDiv.innerHTML = iconMarkup;
+        card.appendChild(iconDiv);
+      }
+
+      // Title & Subtitle Group
+      const textContainer = document.createElement('div');
+      textContainer.className = 'label-text-container';
+      
+      const titleSpan = document.createElement('div');
+      titleSpan.className = 'label-title';
+      titleSpan.innerText = data.name;
+      textContainer.appendChild(titleSpan);
+
+      if (data.subtitle) {
+        const subSpan = document.createElement('div');
+        subSpan.className = 'label-subtitle';
+        subSpan.innerText = data.subtitle;
+        textContainer.appendChild(subSpan);
+      }
+
+      card.appendChild(textContainer);
+
+      // Footnote baseline
+      if (data.footnote) {
+        const footSpan = document.createElement('div');
+        footSpan.className = 'label-footnote';
+        footSpan.innerText = data.footnote;
+        card.appendChild(footSpan);
+      }
+
+      return card;
+    }
+
+    // Real-Time Preview Generator
+    function updateRealTimePreview() {
+      const currentConfig = {
+        name: inputName.value.trim() || "Spices",
+        subtitle: inputSubtitle.value.trim(),
+        footnote: inputFootnote.value.trim(),
+        theme: selectTheme.value,
+        color: selectColor.value,
+        icon: selectIcon.value
+      };
+      
+      previewContainer.innerHTML = "";
+      const previewNode = constructLabelElement(currentConfig, true);
+      previewContainer.appendChild(previewNode);
+    }
+
+    // Dimension manipulator mapping values to root variables
+    function updatePhysicalDimensions() {
+      const w = parseFloat(inputWidth.value) || 3.0;
+      const h = parseFloat(inputHeight.value) || 3.0;
+      document.documentElement.style.setProperty('--label-width', `${w}in`);
+      document.documentElement.style.setProperty('--label-height', `${h}in`);
+    }
+
+    // Font Scaling manipulator updating root variables
+    function updateFontScaling() {
+      const tVal = scaleTitle.value;
+      const sVal = scaleSubtitle.value;
+      const fVal = scaleFootnote.value;
+
+      document.documentElement.style.setProperty('--title-scale', tVal);
+      document.documentElement.style.setProperty('--subtitle-scale', sVal);
+      document.documentElement.style.setProperty('--footnote-scale', fVal);
+
+      valTitle.innerText = `${Math.round(tVal * 100)}%`;
+      valSubtitle.innerText = `${Math.round(sVal * 100)}%`;
+      valFootnote.innerText = `${Math.round(fVal * 100)}%`;
+    }
+
+    // Delete isolated label
+    function deleteLabel(id) {
+      labelCollection = labelCollection.filter(item => item.id !== id);
+      if (editingId === id) {
+        exitEditMode();
+      } else {
+        renderSheetGrid();
+      }
+    }
+
+    // Full Grid Sheet rendering loop
+    function renderSheetGrid() {
+      gridContainer.innerHTML = "";
+      if (labelCollection.length === 0) {
+        gridContainer.innerHTML = `<p style="color: #a0aec0; font-style: italic; padding: 20px;">No labels added yet. Use the sidebar on the left to configure and add labels.</p>`;
+        return;
+      }
+      labelCollection.forEach(labelData => {
+        const labelNode = constructLabelElement(labelData);
+        gridContainer.appendChild(labelNode);
+      });
+    }
+
+    // Initial load orchestration
+    updatePhysicalDimensions();
+    updateFontScaling();
+    updateRealTimePreview();
+    renderSheetGrid();
+  </script>
+</body>
+</html>
