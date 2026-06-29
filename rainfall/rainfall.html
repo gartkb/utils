@@ -109,8 +109,9 @@
                         <div>
                             <label for="soil-profile-select" class="block text-xs text-slate-400 mb-1">Microclimate Profile</label>
                             <select id="soil-profile-select" onchange="changeSoilProfile(this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 text-slate-200">
-                                <option value="standard">Standard Soil / Bare Surface (Threshold: 0.18 m³/m³)</option>
-                                <option value="mulched" selected>Raised Bed + Cardboard Mulch & Deep Roots (Threshold: 0.12 m³/m³)</option>
+                                <option value="standard">Standard Bare Soil (Threshold: 0.18 m³/m³)</option>
+                                <option value="collar" selected>Raised Bed + Egg-Flat Collar Mulch (Threshold: 0.14 m³/m³)</option>
+                                <option value="mulched">Raised Bed + Full Cardboard Mulch & Deep Roots (Threshold: 0.12 m³/m³)</option>
                             </select>
                         </div>
                     </div>
@@ -331,7 +332,7 @@
             apiKey: localStorage.getItem('geoapify_key') || '',
             favorites: JSON.parse(localStorage.getItem('saved_locations')) || [],
             activeLocation: JSON.parse(localStorage.getItem('active_location')) || null,
-            soilProfile: localStorage.getItem('soil_profile') || 'mulched', // standard vs mulched
+            soilProfile: localStorage.getItem('soil_profile') || 'collar', // standard, collar, vs mulched
             wateredLog: JSON.parse(localStorage.getItem('watered_log_multi')) || {}, // locationId -> { 'YYYY-MM-DD': 'light'|'medium'|'heavy' }
             weatherData: null,
             predictedWaterDate: null // calculated target YYYY-MM-DD
@@ -340,6 +341,7 @@
         // Soil profiles parameters
         const soilThresholds = {
             standard: 0.18, 
+            collar: 0.14,
             mulched: 0.12   
         };
 
@@ -533,7 +535,6 @@
         async function fetchAndRenderWeather(loc) {
             showLoadingState();
 
-            // Format dynamic dates for the historical API
             const today = new Date();
             const getISOString = (d) => {
                 const year = d.getFullYear();
@@ -548,8 +549,6 @@
             const startDate = getISOString(sevenDaysAgoObj);
             const endDate = getISOString(yesterdayObj);
 
-            // Parallel Blending: Fetch guaranteed historical archive & standard future forecast in tandem
-            // FIXED: Requested 'soil_moisture_0_to_7cm' for the reanalysis archive to prevent 0-value gaps
             const archiveUrl = `https://archive-api.open-meteo.com/v1/archive?latitude=${loc.lat}&longitude=${loc.lon}&start_date=${startDate}&end_date=${endDate}&daily=precipitation_sum,temperature_2m_max&hourly=soil_moisture_0_to_7cm&timezone=auto`;
             const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max&hourly=soil_moisture_3_to_9cm&timezone=auto`;
             
@@ -575,7 +574,6 @@
         }
 
         function blendWeatherData(archive, forecast) {
-            // Find the active day aligned with local coordinate time
             const localTimeAtLocation = new Date(Date.now() + (forecast.utc_offset_seconds * 1000));
             const year = localTimeAtLocation.getUTCFullYear();
             const month = String(localTimeAtLocation.getUTCMonth() + 1).padStart(2, '0');
@@ -591,7 +589,6 @@
             archive.hourly.time.forEach((tStr, idx) => {
                 const datePart = tStr.substring(0, 10);
                 if (!archiveSoilByDay[datePart]) archiveSoilByDay[datePart] = [];
-                // FIXED: Map 'soil_moisture_0_to_7cm' for correct reanalysis retrieval
                 if (archive.hourly.soil_moisture_0_to_7cm && archive.hourly.soil_moisture_0_to_7cm[idx] !== null && archive.hourly.soil_moisture_0_to_7cm[idx] !== undefined) {
                     archiveSoilByDay[datePart].push(archive.hourly.soil_moisture_0_to_7cm[idx]);
                 }
@@ -604,7 +601,7 @@
                     date: date,
                     isPast: true,
                     rain: archiveRain[idx] || 0,
-                    prob: 0, // No probability for archived actuals
+                    prob: 0,
                     tempMax: archiveTemp[idx] || 0,
                     soil: avgSoil
                 };
@@ -627,13 +624,12 @@
 
             const forecastList = [];
             forecastDates.forEach((date, idx) => {
-                // Ensure we only include today and future dates from the forecast call
                 if (date >= todayStr) {
                     const soilVals = forecastSoilByDay[date] || [];
                     const avgSoil = soilVals.length > 0 ? (soilVals.reduce((a, b) => a + b, 0) / soilVals.length) : 0;
                     forecastList.push({
                         date: date,
-                        isPast: date === todayStr, // Today is flagged past for manual logging purposes
+                        isPast: date === todayStr,
                         rain: forecastRain[idx] || 0,
                         prob: forecastProb[idx] || 0,
                         tempMax: forecastTemp[idx] || 0,
@@ -642,7 +638,21 @@
                 }
             });
 
-            // 3. Concatenate clean datasets
+            // 3. Apply Bias Correction to align forecast baseline with archive baseline [1]
+            if (archiveList.length > 0 && forecastList.length > 0) {
+                const lastArchiveSoil = archiveList[archiveList.length - 1].soil;
+                const firstForecastSoil = forecastList[0].soil;
+
+                if (lastArchiveSoil > 0 && firstForecastSoil > 0) {
+                    const biasOffset = firstForecastSoil - lastArchiveSoil;
+
+                    forecastList.forEach(day => {
+                        day.soil = Math.max(0.05, day.soil - biasOffset);
+                    });
+                }
+            }
+
+            // 4. Concatenate clean, aligned datasets [1]
             state.weatherData = [...archiveList, ...forecastList];
         }
 
@@ -657,7 +667,6 @@
             const forecastRainTotal = state.weatherData.filter(d => !d.isPast).reduce((a, c) => a + c.rain, 0);
             const maxForecastProb = state.weatherData.filter(d => !d.isPast).reduce((a, c) => c.prob > a ? c.prob : a, 0);
 
-            // Fetch state representation aligned with coordinate clock
             const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
             const soilToday = state.weatherData.find(d => d.date === todayStr)?.soil || 0;
 
@@ -679,7 +688,6 @@
                 soilStatus.className = "text-[10px] text-emerald-400 mt-1 font-semibold";
             }
 
-            // Execute predictive modules before rendering viewports
             calculatePredictedWateringDate();
             runWateringAdvisor();
             drawChart();
@@ -694,7 +702,6 @@
             const log = state.wateredLog[locId] || {};
             const criticalThresh = soilThresholds[state.soilProfile];
 
-            // 1. Get safety duration based on last registered manual watering log
             let lastWaterDate = null;
             let protectionDays = 0;
 
@@ -719,7 +726,6 @@
                 protectionExpiresStr = expDate.toLocaleDateString('en-CA');
             }
 
-            // 2. Locate first forecast date when Open-Meteo projects drop below critical threshold
             let forecastDryDate = null;
             for (let i = 0; i < state.weatherData.length; i++) {
                 const day = state.weatherData[i];
@@ -731,7 +737,6 @@
                 }
             }
 
-            // 3. Resolve max index date
             let finalTarget = null;
             if (forecastDryDate && protectionExpiresStr) {
                 finalTarget = (forecastDryDate > protectionExpiresStr) ? forecastDryDate : protectionExpiresStr;
@@ -741,7 +746,6 @@
                 finalTarget = protectionExpiresStr;
             }
 
-            // Ensure our suggestion doesn't point to the past or today
             if (finalTarget && finalTarget > todayStr) {
                 state.predictedWaterDate = finalTarget;
             } else {
@@ -812,7 +816,6 @@
             const soilIsDry = currentSoil < criticalThresh;
             const soilIsBorderline = currentSoil >= criticalThresh && currentSoil < (criticalThresh + 0.04);
 
-            // Populate visual recommendation descriptions
             const desc = document.getElementById('advisor-description');
             
             if (wateringProtectionActive) {
@@ -820,7 +823,7 @@
             } else if (incomingHeavyRain) {
                 setAdvisorUi('rain', 'Rain Protected', `Significant rainfall is expected in the next 48 hours (~${totalUpcomingRain.toFixed(1)}mm with up to ${maxUpcomingProb}% chance). Let natural precipitation refresh the bed.`);
             } else if (soilIsDry) {
-                setAdvisorUi('alert', 'Water Recommended', `Ground soil moisture of ${currentSoil.toFixed(3)} m³/m³ is below your configured ${state.soilProfile === 'mulched' ? 'Mulched' : 'Standard'} threshold of ${criticalThresh}. Perform a deep soak.`);
+                setAdvisorUi('alert', 'Water Recommended', `Ground soil moisture of ${currentSoil.toFixed(3)} m³/m³ is below your configured threshold of ${criticalThresh}. Perform a deep soak.`);
             } else if (highHeatIncoming && (soilIsBorderline || soilIsDry)) {
                 setAdvisorUi('heat', 'Preemptive Water', `A heat stress threshold is expected within 3 days (Max temp: ${maxUpcomingTemp.toFixed(1)}°C). Although soil levels look normal, pre-watering deep roots will help prevent leaf-drop.`);
             } else if (soilIsBorderline) {
@@ -829,7 +832,6 @@
                 setAdvisorUi('safe', 'Optimally Moist', `Current soil status (${currentSoil.toFixed(3)}) is stable. Evaporation protection from your cardboard mulch is conserving moisture. No action needed.`);
             }
 
-            // Update Target Date text element
             const pText = document.getElementById('predicted-date-text');
             if (state.predictedWaterDate) {
                 const formattedPred = parseAndFormatDateString(state.predictedWaterDate);
@@ -853,6 +855,7 @@
             statusBadge.className = "text-xs px-2.5 py-1 rounded-full font-bold uppercase tracking-wider ";
 
             statusBadge.innerText = badgeText;
+            document.getElementById('advisor-description').innerText = descriptionText;
 
             if (type === 'safe') {
                 card.classList.add('bg-emerald-950/20', 'border-emerald-800/40');
@@ -889,6 +892,7 @@
             const locKey = state.activeLocation.id;
             const log = state.wateredLog[locKey] || {};
             const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
+            const criticalThresh = soilThresholds[state.soilProfile];
 
             state.weatherData.forEach(day => {
                 const formattedDate = parseAndFormatDateString(day.date);
@@ -901,20 +905,26 @@
                 tr.innerHTML = `
                     <td class="py-3 px-3 font-semibold ${day.date === todayStr ? 'text-emerald-400' : ''} ${isTargetDate ? 'text-red-400' : ''}">
                         ${formattedDate} 
-                        ${day.date === todayStr ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded ml-1 font-bold uppercase">Today</span>' : ''}
-                        ${isTargetDate ? '<span class="text-[9px] bg-red-500/20 text-red-300 px-1.5 py-0.5 rounded ml-1 font-bold uppercase"><i class="fa-solid fa-droplet text-[8px] mr-0.5"></i> Target</span>' : ''}
+                        ${day.date === todayStr ? '<span class="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded ml-1 font-bold text-emerald-400">TODAY</span>' : ''}
+                        ${isTargetDate ? '<span class="text-[10px] bg-red-500/20 px-1.5 py-0.5 rounded ml-1 font-bold text-red-400">TARGET</span>' : ''}
                     </td>
-                    <td class="py-3 px-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${day.isPast ? 'bg-slate-800 text-slate-400' : 'bg-orange-500/10 text-orange-400'}">
-                            ${day.isPast ? 'Past' : 'Forecast'}
-                        </span>
+                    <td class="py-3 px-3 text-slate-400">
+                        ${day.isPast ? 'Actual' : 'Forecast'}
                     </td>
-                    <td class="py-3 px-3 font-mono font-bold">${day.rain.toFixed(1)} mm</td>
-                    <td class="py-3 px-3 font-mono text-slate-400">${day.prob > 0 ? `${day.prob}%` : '-'}</td>
-                    <td class="py-3 px-3 font-semibold text-red-400">${day.tempMax.toFixed(1)}°C</td>
-                    <td class="py-3 px-3 font-mono text-emerald-400 font-medium">${day.soil > 0 ? day.soil.toFixed(3) : 'N/A'}</td>
+                    <td class="py-3 px-3 font-semibold ${day.rain > 0 ? 'text-blue-400' : 'text-slate-500'}">
+                        ${day.rain.toFixed(1)} mm
+                    </td>
+                    <td class="py-3 px-3 text-slate-400">
+                        ${day.isPast ? '-' : day.prob + '%'}
+                    </td>
+                    <td class="py-3 px-3 font-semibold text-slate-200">
+                        ${day.tempMax.toFixed(1)}°C
+                    </td>
+                    <td class="py-3 px-3 font-semibold ${day.soil < criticalThresh ? 'text-red-400' : 'text-emerald-400'}">
+                        ${day.soil.toFixed(3)}
+                    </td>
                     <td class="py-3 px-3 text-right">
-                        <select onchange="updateWaterLevel('${day.date}', this.value)" class="bg-slate-950 border border-slate-700 rounded px-1.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-teal-500">
+                        <select onchange="logWatering('${day.date}', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs focus:outline-none focus:border-cyan-500 text-slate-200">
                             <option value="none" ${currentSelection === 'none' ? 'selected' : ''}>None</option>
                             <option value="light" ${currentSelection === 'light' ? 'selected' : ''}>Light (💧)</option>
                             <option value="medium" ${currentSelection === 'medium' ? 'selected' : ''}>Medium (💧💧)</option>
@@ -926,226 +936,142 @@
             });
         }
 
-        function updateWaterLevel(dateStr, level) {
-            const locId = state.activeLocation.id;
-            if (!state.wateredLog[locId]) {
-                state.wateredLog[locId] = {};
-            }
-
-            if (level === 'none') {
-                delete state.wateredLog[locId][dateStr];
+        function logWatering(date, value) {
+            const locKey = state.activeLocation.id;
+            if (!state.wateredLog[locKey]) state.wateredLog[locKey] = {};
+            if (value === 'none') {
+                delete state.wateredLog[locKey][date];
             } else {
-                state.wateredLog[locId][dateStr] = level;
+                state.wateredLog[locKey][date] = value;
             }
-
             localStorage.setItem('watered_log_multi', JSON.stringify(state.wateredLog));
-            
-            // Instantly update targets and state logic
-            calculatePredictedWateringDate();
-            runWateringAdvisor();
-            drawChart();
-            renderTable();
+            renderDashboard(state.activeLocation);
         }
 
-        // Draw Custom Chart
+        // Render Graph Canvas
         function drawChart() {
-            const ctx = document.getElementById('weather-chart').getContext('2d');
-            if (chartInstance) chartInstance.destroy();
+            const canvas = document.getElementById('weather-chart');
+            if (!canvas) return;
 
-            const dates = state.weatherData.map(d => parseAndFormatDateString(d.date));
-            const rawDates = state.weatherData.map(d => d.date);
+            const labels = state.weatherData.map(d => parseAndFormatDateString(d.date));
             const rainData = state.weatherData.map(d => d.rain);
+            const tempData = state.weatherData.map(d => d.tempMax);
             const soilData = state.weatherData.map(d => d.soil);
-            const tempMaxData = state.weatherData.map(d => d.tempMax);
 
-            const locId = state.activeLocation.id;
-            const log = state.wateredLog[locId] || {};
-            const todayStr = state.weatherData.find(d => d.isPast && !state.weatherData[state.weatherData.indexOf(d) + 1]?.isPast)?.date || state.weatherData[0].date;
-
-            const barBgColors = rawDates.map(d => {
-                const water = log[d];
-                if (water === 'heavy') return 'rgba(6, 182, 212, 0.9)';   
-                if (water === 'medium') return 'rgba(6, 182, 212, 0.6)';  
-                if (water === 'light') return 'rgba(6, 182, 212, 0.35)';  
-                return d <= todayStr ? 'rgba(59, 130, 246, 0.55)' : 'rgba(249, 115, 22, 0.45)'; 
+            const locKey = state.activeLocation.id;
+            const log = state.wateredLog[locKey] || {};
+            const wateredData = state.weatherData.map(d => {
+                const val = log[d.date];
+                if (val === 'heavy') return 8;
+                if (val === 'medium') return 4;
+                if (val === 'light') return 2;
+                return 0;
             });
 
-            const barBorderColors = rawDates.map(d => {
-                const water = log[d];
-                if (water) return '#22d3ee';
-                return d <= todayStr ? '#3b82f6' : '#f97316';
-            });
+            const targetLabel = state.predictedWaterDate ? parseAndFormatDateString(state.predictedWaterDate) : null;
 
-            // Convert predicted ISO date to chart label format
-            const chartTargetLabel = state.predictedWaterDate ? parseAndFormatDateString(state.predictedWaterDate) : null;
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
 
+            const ctx = canvas.getContext('2d');
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: dates,
+                    labels: labels,
                     datasets: [
                         {
-                            label: 'Water Inputs (mm)',
+                            label: 'Rain',
                             data: rainData,
-                            backgroundColor: barBgColors,
-                            borderColor: barBorderColors,
-                            borderWidth: 1.5,
-                            yAxisID: 'yRain',
-                            order: 3,
-                            borderRadius: 4
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#3b82f6',
+                            borderWidth: 1,
+                            yAxisID: 'y'
                         },
                         {
-                            label: 'Soil Moisture (m³/m³)',
+                            label: 'Watered',
+                            data: wateredData,
+                            backgroundColor: '#06b6d4',
+                            borderColor: '#06b6d4',
+                            borderWidth: 1,
+                            yAxisID: 'y'
+                        },
+                        {
+                            label: 'Soil Moisture',
                             data: soilData,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#10b981',
-                            tension: 0.3,
-                            fill: true,
                             type: 'line',
-                            yAxisID: 'ySoil',
-                            order: 1
+                            borderColor: '#10b981',
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#10b981',
+                            yAxisID: 'y1'
                         },
                         {
-                            label: 'Max Temperature (°C)',
-                            data: tempMaxData,
-                            borderColor: '#ef4444',
-                            borderWidth: 1.5,
-                            borderDash: [5, 5],
-                            pointStyle: 'crossRot',
-                            pointHoverRadius: 6,
-                            pointRadius: 2,
-                            tension: 0.2,
-                            fill: false,
+                            label: 'Max Temp',
+                            data: tempData.map(t => t / 3), // scaled by 3 to fit left scale
                             type: 'line',
-                            yAxisID: 'yTemp',
-                            order: 2
+                            borderColor: '#ef4444',
+                            borderDash: [5, 5],
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            pointRadius: 2,
+                            pointBackgroundColor: '#ef4444',
+                            yAxisID: 'y'
                         }
                     ]
                 },
-                plugins: [verticalTargetLinePlugin],
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     scales: {
-                        x: {
-                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
-                            ticks: { color: '#94a3b8', font: { size: 10 } }
-                        },
-                        yRain: {
+                        y: {
                             type: 'linear',
+                            display: true,
                             position: 'left',
-                            title: { display: true, text: 'Rain / Water Vol (mm)', color: '#3b82f6', font: { weight: 'bold', size: 11 } },
-                            grid: { color: 'rgba(51, 65, 85, 0.2)' },
-                            ticks: { color: '#94a3b8' },
-                            suggestedMin: 0,
-                            suggestedMax: 10
+                            min: 0,
+                            max: 12,
+                            title: {
+                                display: true,
+                                text: 'Rain / Water Vol (mm)',
+                                color: '#94a3b8',
+                                font: { size: 10 }
+                            },
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
                         },
-                        ySoil: {
+                        y1: {
                             type: 'linear',
+                            display: true,
                             position: 'right',
-                            title: { display: true, text: 'Soil Moisture (m³/m³)', color: '#10b981', font: { weight: 'bold', size: 11 } },
+                            min: 0,
+                            max: 0.40,
+                            title: {
+                                display: true,
+                                text: 'Soil Moisture (m³/m³)',
+                                color: '#94a3b8',
+                                font: { size: 10 }
+                            },
                             grid: { drawOnChartArea: false },
-                            ticks: { color: '#94a3b8' },
-                            suggestedMin: 0.08,
-                            suggestedMax: 0.38
+                            ticks: { color: '#94a3b8' }
                         },
-                        yTemp: {
-                            type: 'linear',
-                            position: 'right',
-                            title: { display: false },
-                            grid: { drawOnChartArea: false },
-                            ticks: { display: false }, 
-                            suggestedMin: 5,
-                            suggestedMax: 35
+                        x: {
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
                         }
                     },
                     plugins: {
                         legend: { display: false },
                         verticalTargetLine: {
-                            targetLabel: chartTargetLabel
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) label += ': ';
-                                    if (context.parsed.y !== null) {
-                                        if (context.datasetIndex === 1) {
-                                            label += context.parsed.y.toFixed(3);
-                                        } else {
-                                            label += context.parsed.y.toFixed(1);
-                                        }
-                                    }
-                                    const index = context.dataIndex;
-                                    const dateKey = rawDates[index];
-                                    const waterLevel = log[dateKey];
-                                    if (context.datasetIndex === 0 && waterLevel) {
-                                        label += ` (Watered: ${waterLevel.toUpperCase()})`;
-                                    }
-                                    return label;
-                                }
-                            }
+                            targetLabel: targetLabel
                         }
                     }
-                }
+                },
+                plugins: [verticalTargetLinePlugin]
             });
         }
 
         // Favorites Handling
-        function toggleCurrentFavorite() {
-            if (!state.activeLocation) return;
-            const idx = state.favorites.findIndex(fav => fav.id === state.activeLocation.id);
-            if (idx > -1) {
-                state.favorites.splice(idx, 1);
-            } else {
-                state.favorites.push(state.activeLocation);
-            }
-            localStorage.setItem('saved_locations', JSON.stringify(state.favorites));
-            renderFavorites();
-            updateFavoriteButtonState();
-        }
-
-        // Render Favorites Sidebar list
-        function renderFavorites() {
-            const container = document.getElementById('favorites-list');
-            container.innerHTML = '';
-            if (state.favorites.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-slate-500 text-xs">No saved beds.</div>`;
-                return;
-            }
-            state.favorites.forEach(fav => {
-                const isActive = state.activeLocation && state.activeLocation.id === fav.id;
-                const div = document.createElement('div');
-                div.className = `group flex justify-between items-center p-2.5 rounded-lg text-xs cursor-pointer border transition-all ${
-                    isActive ? 'bg-emerald-600/10 border-emerald-500/50 text-emerald-300' : 'bg-slate-900/50 hover:bg-slate-800 border-slate-800 text-slate-300'
-                }`;
-                div.innerHTML = `
-                    <div onclick="selectFavorite('${fav.id}')" class="flex-grow font-semibold truncate pr-2">
-                        <i class="fa-solid fa-seedling mr-1.5 text-emerald-500"></i> ${fav.name}
-                    </div>
-                    <button onclick="deleteFavorite(event, '${fav.id}')" class="opacity-0 group-hover:opacity-100 hover:text-red-400 text-slate-500 p-1 rounded transition-opacity">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function selectFavorite(id) {
-            const match = state.favorites.find(fav => fav.id === id);
-            if (match) setActiveLocation(match);
-        }
-
-        function deleteFavorite(event, id) {
-            event.stopPropagation();
-            state.favorites = state.favorites.filter(fav => fav.id !== id);
-            localStorage.setItem('saved_locations', JSON.stringify(state.favorites));
-            renderFavorites();
-            updateFavoriteButtonState();
-        }
-
         function updateFavoriteButtonState() {
             const btn = document.getElementById('favorite-current-btn');
             if (!state.activeLocation) {
@@ -1153,52 +1079,78 @@
                 return;
             }
             btn.classList.remove('hidden');
-            const isSaved = state.favorites.some(fav => fav.id === state.activeLocation.id);
-            if (isSaved) {
-                btn.innerHTML = `<i class="fa-solid fa-star text-yellow-500"></i> <span class="text-yellow-500 hover:underline">Saved</span>`;
+            const isFav = state.favorites.some(f => f.id === state.activeLocation.id);
+            if (isFav) {
+                btn.innerHTML = `<i class="fa-solid fa-star text-yellow-500"></i> Saved`;
             } else {
-                btn.innerHTML = `<i class="fa-solid fa-plus text-blue-400"></i> <span class="text-blue-400 hover:underline">Save Bed</span>`;
+                btn.innerHTML = `<i class="fa-solid fa-plus"></i> Save Active`;
             }
         }
 
-        function refreshCurrentLocation() {
-            if (state.activeLocation) fetchAndRenderWeather(state.activeLocation);
+        function toggleCurrentFavorite() {
+            if (!state.activeLocation) return;
+            const index = state.favorites.findIndex(f => f.id === state.activeLocation.id);
+            if (index > -1) {
+                state.favorites.splice(index, 1);
+            } else {
+                state.favorites.push(state.activeLocation);
+            }
+            localStorage.setItem('saved_locations', JSON.stringify(state.favorites));
+            updateFavoriteButtonState();
+            renderFavorites();
         }
 
-        // Helpers
-        function parseAndFormatDateString(isoString) {
-            const parts = isoString.split('-');
-            const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-            return dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        }
-
-        function getLocalDateString() {
-            const d = new Date();
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        function loadSampleLocation() {
-            setActiveLocation({
-                id: "geo-49.2827--123.1207",
-                name: "Vancouver Tomato Bed",
-                lat: 49.2827,
-                lon: -123.1207,
-                formatted: "Vancouver, BC, Canada"
+        function renderFavorites() {
+            const list = document.getElementById('favorites-list');
+            list.innerHTML = '';
+            if (state.favorites.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-8 text-slate-500 text-xs">
+                        No saved locations.
+                    </div>
+                `;
+                return;
+            }
+            state.favorites.forEach(fav => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-slate-800/50 border border-slate-700/50 rounded-lg p-3 hover:border-slate-600 transition-all cursor-pointer";
+                div.onclick = () => setActiveLocation(fav);
+                div.innerHTML = `
+                    <div class="flex-grow min-w-0">
+                        <p class="text-xs font-semibold text-slate-200 truncate">${fav.name}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Lat: ${fav.lat.toFixed(3)}, Lon: ${fav.lon.toFixed(3)}</p>
+                    </div>
+                    <button onclick="deleteFavorite('${fav.id}', event)" class="text-slate-500 hover:text-red-400 p-1 ml-2 transition-all">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                `;
+                list.appendChild(div);
             });
         }
 
-        function showAlert(message) {
-            const box = document.getElementById('alert-box');
-            document.getElementById('alert-message').innerText = message;
-            box.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function deleteFavorite(id, event) {
+            event.stopPropagation();
+            state.favorites = state.favorites.filter(f => f.id !== id);
+            localStorage.setItem('saved_locations', JSON.stringify(state.favorites));
+            renderFavorites();
+            updateFavoriteButtonState();
         }
 
-        function hideAlert() {
-            document.getElementById('alert-box').classList.add('hidden');
+        function loadSampleLocation() {
+            const sample = {
+                id: 'sample-vancouver',
+                name: 'Vancouver (Raised Bed)',
+                lat: 49.2827,
+                lon: -123.1207,
+                formatted: 'Vancouver, BC, Canada'
+            };
+            setActiveLocation(sample);
+        }
+
+        function refreshCurrentLocation() {
+            if (state.activeLocation) {
+                fetchAndRenderWeather(state.activeLocation);
+            }
         }
 
         function showEmptyState() {
@@ -1207,11 +1159,40 @@
         }
 
         function showLoadingState() {
-            document.body.style.cursor = 'wait';
+            const btn = document.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Loading...`;
+            }
         }
 
         function hideLoadingState() {
-            document.body.style.cursor = 'default';
+            const btn = document.querySelector('button[type="submit"]');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-magnifying-glass"></i> Search`;
+            }
+        }
+
+        function showAlert(msg) {
+            const box = document.getElementById('alert-box');
+            const msgEl = document.getElementById('alert-message');
+            msgEl.innerText = msg;
+            box.classList.remove('hidden');
+            box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function hideAlert() {
+            document.getElementById('alert-box').classList.add('hidden');
+        }
+
+        function parseAndFormatDateString(dateStr) {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
         }
     </script>
 </body>
