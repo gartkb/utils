@@ -21,17 +21,17 @@ jobs:
           curl -s \
             -H "X-API-Key: $AA_API_KEY" \
             "https://artificialanalysis.ai/api/v2/data/llms/models" \
-            -o aa_models.json
+            -o top10-aa/aa_models.json
 
       - name: Fetch OR models
         run: |
-          curl -s "https://openrouter.ai/api/v1/models" -o or_models.json
+          curl -s "https://openrouter.ai/api/v1/models" -o top10-aa/or_models.json
 
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add aa_models.json or_models.json
+          git add top10-aa/aa_models.json top10-aa/or_models.json
           if ! git diff --staged --quiet; then
             git commit -m "chore: update model data $(date -u +%Y-%m-%dT%H:%MZ)"
             git push
