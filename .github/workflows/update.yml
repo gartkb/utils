@@ -1,0 +1,33 @@
+name: Update AA data hourly
+on:
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch AA bulk
+        env:
+          AA_API_KEY: ${{ secrets.AA_API_KEY }}
+        run: |
+          curl -s -H "X-API-Key: *** \
+            https://artificialanalysis.ai/api/v2/data/llms/models \
+            -o aa_models.json
+      - name: Fetch OR models
+        run: |
+          curl -s https://openrouter.ai/api/v1/models -o or_models.json
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet aa_models.json or_models.json; then
+            git add aa_models.json or_models.json
+            git commit -m "chore: update model data $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          else
+            echo "No changes"
+          fi
