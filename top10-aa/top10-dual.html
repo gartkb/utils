@@ -62,7 +62,7 @@ a:hover{text-decoration:underline}
   </div>
 </header>
 <div id="err"></div>
-<div id="log">Ready. Local-first mode: tries ./aa_models.json + ./or_models.json (same dir, no key, no CORS) → then live fetch. Copied json files already present — just reload. Paste AA_API_KEY only if you want live bypass of local json.</div>
+<div id="log">Ready. Local-first mode: reads ./aa_models.json + ./or_models.json + ./opencode_models.json (updated hourly via Action) → fallback to live API.</div>
 <main>
   <div class="card" id="leftCard">
     <h2>Free Top 10 — by AA Intelligence</h2>
@@ -96,6 +96,8 @@ const LS_CACHE="aa_or_cache_v2";
 const CACHE_TTL_MS=6*60*60*1000;
 const TOKENS_PER_TASK=10000;
 
+let lastDataTime = null;
+
 const el = id=>document.getElementById(id);
 const log = msg=>{ el('log').textContent = msg; };
 const showErr = msg=>{ const e=el('err'); e.style.display='block'; e.textContent=msg; };
@@ -124,6 +126,15 @@ function uptimeBadge(v){
   return `<span class="badge ${cls}">${n.toFixed(1)}%</span>`;
 }
 
+function getDataAgeBadge(){
+  if(!lastDataTime) return '<span class="badge">live API</span>';
+  const mins = Math.max(0, Math.round((Date.now() - lastDataTime.getTime()) / 60000));
+  if(mins < 60) return `<span class="badge ok">data: ${mins}m ago</span>`;
+  const hours = (mins / 60).toFixed(1);
+  const cls = mins > 180 ? "bad" : "warn";
+  return `<span class="badge ${cls}">data: ${hours}h ago</span>`;
+}
+
 async function fetchJSON(url, opts={}){
   const r=await fetch(url, opts);
   if(!r.ok) throw new Error(url+" → "+r.status+" "+r.statusText);
@@ -133,29 +144,45 @@ function loadCache(){
   try{ const c=JSON.parse(localStorage.getItem(LS_CACHE)||"null"); if(!c) return null; if(Date.now()-c.ts > CACHE_TTL_MS) return null; return c; }catch{ return null; }
 }
 function saveCache(data){ localStorage.setItem(LS_CACHE, JSON.stringify({ts:Date.now(), ...data})); }
+
 async function fetchLocalJSON(path){
   try{
-    const r=await fetch(path, {cache:"no-store"});
+    // Append timestamp to prevent GitHub Pages aggressive browser caching
+    const r=await fetch(path + (path.includes('?') ? '&' : '?') + 't=' + Date.now(), {cache:"no-store"});
     if(!r.ok) return null;
+    const modHeader = r.headers.get("Last-Modified");
+    if(modHeader && !lastDataTime){
+      lastDataTime = new Date(modHeader);
+    }
     const j=await r.json();
     return j.data||j;
   }catch{ return null; }
 }
+
 async function fetchORModels(){
   const local=await fetchLocalJSON("./or_models.json");
   if(local && Array.isArray(local) && local.length>50) return local;
   const j=await fetchJSON("https://openrouter.ai/api/v1/models");
   return j.data||j;
 }
+
 async function fetchOpencodeModels(){
+  // 1. Try local file saved hourly by GitHub Actions
+  const local=await fetchLocalJSON("./opencode_models.json");
+  if(local){
+    const list = local.models || local.data || local;
+    if(Array.isArray(list) && list.length>0) return list;
+  }
+  // 2. Fallback to live API fetch
   try{
     const j=await fetchJSON("https://opencode.ai/zen/v1/models");
     return j.data||j.models||j;
   }catch(e){
-    log("Opencode fetch failed (offline?) — continuing with OR+AA only. "+e.message);
+    log("Opencode live fetch failed (CORS/offline?) — continuing with OR+AA only.");
     return [];
   }
 }
+
 async function fetchAA(force=false){
   const cached=loadCache();
   if(!force && cached && cached.aa) return cached.aa;
@@ -166,13 +193,14 @@ async function fetchAA(force=false){
     return local;
   }
   const key=getAAKey();
-  if(!key) throw new Error("AA_API_KEY missing and no ./aa_models.json found — copy AA bulk to ./aa_models.json next to this html or paste key above and Save.");
+  if(!key) throw new Error("AA_API_KEY missing and no ./aa_models.json found — run the GitHub Action to generate json files or paste key above.");
   const j=await fetchJSON("https://artificialanalysis.ai/api/v2/data/llms/models", {headers:{"X-API-Key":key}});
   const data=j.data||j;
   const existing=loadCache()||{};
   saveCache({aa:data, or: existing.or || null});
   return data;
 }
+
 async function fetchUptimeFor(ids){
   const out={};
   await Promise.all(ids.map(async id=>{
@@ -187,6 +215,7 @@ async function fetchUptimeFor(ids){
   }));
   return out;
 }
+
 function buildFreeUniverse(orModels, opModels){
   const orFreeAll = orModels.filter(m=> m.pricing && m.pricing.prompt==="0" && m.pricing.completion==="0");
   const orFreeTools = orFreeAll.filter(m=> (m.supported_parameters||[]).includes("tools"));
@@ -194,12 +223,14 @@ function buildFreeUniverse(orModels, opModels){
   const freeIds = new Set([...orFreeTools.map(m=>m.id), ...opFreeIds]);
   return {orFreeAll, orFreeTools, opFreeIds, freeIds, orMap: new Map(orModels.map(m=>[m.id,m]))};
 }
+
 function toBaseSlug(id){
   let s=id.split("/").pop().split(":")[0];
   s=s.replace(/-free$/,"");
   s=s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   return s;
 }
+
 const FREE_AA_MAP={
   "z-ai/glm-5.2:free":"glm-5-2",
   "minimax/minimax-m3:free":"minimax-m3",
@@ -214,7 +245,10 @@ const FREE_AA_MAP={
   "nvidia/nemotron-3.5-lightning:free":"nemotron-3-5-lightning",
   "cohere/north-mini-code:free":"north-mini-code",
   "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free":"nemotron-3-nano-omni-30b-a3b",
+  "muse-spark-1.3-contributor-free":"muse-spark-1-3",
+  "muse-spark-1.3-free":"muse-spark-1-3",
   "muse-spark-1.2-contributor-free":"muse-spark-1-2",
+  "muse-spark-1.2-free":"muse-spark-1-2",
   "deepseek-v4-flash-free":"deepseek-v4-flash",
   "mimo-v2.5-free":"mimo-v2-5-0424",
   "nemotron-3-ultra-free":"nvidia-nemotron-3-ultra-550b-a55b",
@@ -230,7 +264,7 @@ const FREE_AA_MAP={
 
 let currentLeft=[], currentRight=[], currentAA=[], currentFreeSet=new Set();
 let rightThresh=40, rightMode="value";
-let allAACandidates=[]; // full priced list for re-render without refetch
+let allAACandidates=[];
 
 function sortTable(tableId, colIdx, dir){
   const tbody=document.querySelector(`#${tableId} tbody`);
@@ -247,6 +281,7 @@ function sortTable(tableId, colIdx, dir){
   rows.forEach(r=>tbody.appendChild(r));
   rows.forEach((r,i)=>{ r.children[0].textContent=i+1; });
 }
+
 function makeSortable(tableId){
   const ths=document.querySelectorAll(`#${tableId} th`);
   ths.forEach((th,idx)=>{
@@ -259,8 +294,6 @@ function makeSortable(tableId){
 }
 
 function computeFrontier(candidates){
-  // Pareto frontier: no other model is both cheaper and smarter
-  // sort by price asc, keep max intel so far
   const sorted=[...candidates].sort((a,b)=> a.price - b.price || b.intel - a.intel);
   const frontier=[];
   let maxIntel=-Infinity;
@@ -270,7 +303,6 @@ function computeFrontier(candidates){
       maxIntel=c.intel;
     }
   }
-  // frontier is price-asc; for display sort by intel desc so smartest at top
   return frontier.sort((a,b)=> b.intel - a.intel);
 }
 
@@ -283,7 +315,18 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
     const code = aa ? aa.evaluations?.artificial_analysis_coding_index : null;
     return {id, ctx:m.context_length, provider: m.id.split("/")[0], aaSlug, intel, code, uptime: uptimeMap[id]||null};
   });
-  const opOnly = ["muse-spark-1.2-contributor-free","deepseek-v4-flash-free","mimo-v2.5-free","nemotron-3-ultra-free","nemotron-3.5-lightning-free","ling-3.0-flash-fin-free","laguna-s-2.1-free","big-pickle"];
+
+  const opOnly = [
+    "muse-spark-1.3-contributor-free",
+    "muse-spark-1.2-contributor-free",
+    "deepseek-v4-flash-free",
+    "mimo-v2.5-free",
+    "nemotron-3-ultra-free",
+    "nemotron-3.5-lightning-free",
+    "ling-3.0-flash-fin-free",
+    "laguna-s-2.1-free",
+    "big-pickle"
+  ];
   const existingIds=new Set(rows.map(r=>r.id));
   for(const oid of opOnly){
     if(existingIds.has(oid)) continue;
@@ -291,15 +334,27 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
     const aa=aaSlug?aaBySlug.get(aaSlug):null;
     const intel=aa?aa.evaluations?.artificial_analysis_intelligence_index:null;
     const code=aa?aa.evaluations?.artificial_analysis_coding_index:null;
-    const ctxMap={"muse-spark-1.2-contributor-free":1048576,"deepseek-v4-flash-free":1048576,"mimo-v2.5-free":262144,"nemotron-3-ultra-free":1000000,"nemotron-3.5-lightning-free":1000000,"ling-3.0-flash-fin-free":262144,"laguna-s-2.1-free":262144,"big-pickle":200000};
+    const ctxMap={
+      "muse-spark-1.3-contributor-free":1048576,
+      "muse-spark-1.2-contributor-free":1048576,
+      "deepseek-v4-flash-free":1048576,
+      "mimo-v2.5-free":262144,
+      "nemotron-3-ultra-free":1000000,
+      "nemotron-3.5-lightning-free":1000000,
+      "ling-3.0-flash-fin-free":262144,
+      "laguna-s-2.1-free":262144,
+      "big-pickle":200000
+    };
     rows.push({id:oid, ctx:ctxMap[oid]||0, provider:"opencode", aaSlug, intel, code, uptime:null});
   }
+
   rows.sort((a,b)=>{
     if(a.intel==null && b.intel==null) return 0;
     if(a.intel==null) return 1;
     if(b.intel==null) return -1;
     return b.intel - a.intel;
   });
+
   const ranked = rows.filter(r=>r.intel!=null).slice(0,12);
   const seenSlug=new Set();
   const distinct=[];
@@ -311,12 +366,14 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
     if(distinct.length>=10) break;
   }
   currentLeft = distinct;
+
   const freeSlugs=new Set();
   for(const r of rows){
     if(r.aaSlug) freeSlugs.add(r.aaSlug);
     freeSlugs.add(toBaseSlug(r.id));
   }
   currentFreeSet = freeSlugs;
+
   let html='<table id="leftTable"><thead><tr><th>#</th><th>Model</th><th>AA Intel</th><th>Coding</th><th>Ctx</th><th>Uptime 1d</th><th>Provider</th></tr></thead><tbody>';
   distinct.forEach((r,i)=>{
     const ctxK = r.ctx ? Math.round(r.ctx/1024)+"K" : "—";
@@ -327,20 +384,20 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
   html+='</tbody></table>';
   el('leftBody').innerHTML=html;
   makeSortable('leftTable');
+
   const unbench = rows.filter(r=>r.intel==null).map(r=>r.id);
   el('leftFoot').innerHTML = unbench.length ? `Unbenchmarked free (N/A): ${unbench.map(s=>`<code>${s}</code>`).join(" · ")}` : "";
-  el('leftMeta').textContent = `— updated ${new Date().toLocaleTimeString()} · ${rows.length} free evaluated`;
+  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rows.length} free evaluated`;
 }
 
 function renderRight(aaList){
-  // build full candidates once
   const candidates = aaList
     .map(m=>{
       const ev=m.evaluations||{};
       const intel=ev.artificial_analysis_intelligence_index;
       const price=m.pricing?.price_1m_blended_3_to_1 ?? m.pricing?.price_1m_blended;
       const p = price!=null ? Number(price) : null;
-      return {slug:m.slug, name:m.name||m.slug, provider:m.provider||m.slug.split("-")[0], intel, price:p, ctx:m.context_length||m.context_window||0}
+      return {slug:m.slug, name:m.name||m.slug, provider:m.provider||m.slug.split("-")[0], intel, price:p, ctx:m.context_length||m.context_window||0};
     })
     .filter(x=> x.intel!=null && x.price!=null && x.price>0)
     .map(x=> ({...x, value: x.intel / x.price, costPerTask: x.price * TOKENS_PER_TASK / 1e6 }));
@@ -364,7 +421,7 @@ function applyRightFilters(){
     hint=`Frontier: Pareto (no cheaper+smarter) among ≥${thresh} intel — ${frontier.length} frontier models`;
   }
   currentRight=display;
-  // render table
+
   const isValue = rightMode==="value";
   let html=`<table id="rightTable"><thead><tr><th>#</th><th>Model</th><th>AA Intel</th><th>Price/1M</th><th>Cost/task*</th><th>${isValue?"Value":"Price"}</th><th>Ctx</th><th></th></tr></thead><tbody>`;
   display.forEach((r,i)=>{
@@ -474,7 +531,7 @@ function drawScatter(){
 
 async function buildAll(force=false){
   clearErr();
-  log("Fetching (local-first) OR + Opencode + AA…");
+  log("Fetching (local-first) OR + OpenCode + AA…");
   el('leftBody').textContent="Loading…";
   el('rightBody').textContent="Loading…";
   try{
@@ -486,12 +543,12 @@ async function buildAll(force=false){
     const {orFreeTools} = buildFreeUniverse(orData, opData);
     const aaBySlug=new Map();
     for(const m of aaData){ if(m.slug) aaBySlug.set(m.slug, m); }
-    log(`Fetched ${orData.length} OR models, ${opData.length} Opencode, ${aaData.length} AA. Fetching uptime…`);
+    log(`Fetched ${orData.length} OR models, ${opData.length} OpenCode, ${aaData.length} AA. Fetching uptime…`);
     const uptimeIds = orFreeTools.map(m=>m.id).slice(0,22);
     const uptimeMap = await fetchUptimeFor(uptimeIds);
     renderLeft(orFreeTools, aaBySlug, uptimeMap);
     renderRight(aaData);
-    log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} Opencode, ${aaData.length} AA. Updated ${new Date().toLocaleString()}. Threshold ${rightThresh}, mode ${rightMode}. Click headers to sort. Scatter: click dot → AA page.`);
+    log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} OpenCode, ${aaData.length} AA. Updated ${new Date().toLocaleTimeString()}. Click headers to sort.`);
   }catch(e){
     showErr(String(e.message||e));
     el('leftBody').textContent="Failed — see error above.";
@@ -500,7 +557,7 @@ async function buildAll(force=false){
   }
 }
 
-// right controls wiring
+// Controls wiring
 el('intelThresh').addEventListener('input', (e)=>{
   rightThresh=Number(e.target.value);
   el('threshVal').textContent=String(rightThresh);
