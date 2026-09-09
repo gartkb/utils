@@ -11,15 +11,15 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Aria
 header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 header h1{margin:0;font-size:16px;letter-spacing:-0.02em}
 header .controls{margin-left:auto;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-input[type=password],input[type=text]{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:12px;width:260px}
+input[type=password],input[type=text]{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 8px;border-radius:6px;font-size:12px;width:240px}
 button{background:var(--card);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:12px;cursor:pointer}
 button.primary{background:var(--accent);color:#0b0e14;border-color:var(--accent);font-weight:600}
 button.active{background:var(--accent);color:#0b0e14;border-color:var(--accent)}
 button:disabled{opacity:0.5;cursor:not-allowed}
-.badge{font-size:11px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted)}
-.badge.ok{border-color:#1f6b3a;color:var(--green)}
-.badge.warn{border-color:#7a6510;color:var(--yellow)}
-.badge.bad{border-color:#7a1f1f;color:var(--red)}
+.badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-weight:500}
+.badge.ok{border-color:#1f6b3a;background:#102818;color:var(--green)}
+.badge.warn{border-color:#7a6510;background:#2d2509;color:var(--yellow)}
+.badge.bad{border-color:#7a1f1f;background:#2b0e0e;color:var(--red)}
 .status{font-size:12px;color:var(--muted)}
 main{max-width:1400px;margin:0 auto;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
 @media(max-width:900px){main{grid-template-columns:1fr}}
@@ -33,8 +33,10 @@ main{max-width:1400px;margin:0 auto;padding:16px;display:grid;grid-template-colu
 .toggle button{border:none;border-radius:0;padding:5px 10px;font-size:11px}
 .toggle button.active{background:var(--accent);color:#0b0e14}
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{font-weight:600;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);padding:6px 4px;cursor:pointer;user-select:none}
+th{font-weight:600;text-align:left;color:var(--muted);border-bottom:1px solid var(--border);padding:6px 4px;cursor:pointer;user-select:none;white-space:nowrap}
 th:hover{color:var(--text)}
+th.sorted-asc::after{content:" ▲";font-size:9px;color:var(--accent)}
+th.sorted-desc::after{content:" ▼";font-size:9px;color:var(--accent)}
 td{padding:6px 4px;border-bottom:1px solid #222631;vertical-align:top}
 tr:hover td{background:#1e222b}
 .rank{font-weight:700;width:28px}
@@ -54,7 +56,8 @@ a:hover{text-decoration:underline}
 <header>
   <h1>AA Top 10 — Free (intelligence) vs All (value)</h1>
   <div class="controls">
-    <input id="aaKey" type="password" placeholder="AA_API_KEY (stored in localStorage)">
+    <span id="dataAgeHeader" class="badge">checking data…</span>
+    <input id="aaKey" type="password" placeholder="AA_API_KEY (stored locally)">
     <button id="saveKey">Save key</button>
     <button id="clearKey">Clear</button>
     <button id="refreshBtn" class="primary">Refresh</button>
@@ -62,17 +65,17 @@ a:hover{text-decoration:underline}
   </div>
 </header>
 <div id="err"></div>
-<div id="log">Ready. Local-first mode: reads ./aa_models.json + ./or_models.json + ./opencode_models.json (updated hourly via Action) → fallback to live API.</div>
+<div id="log">Ready. Local-first: reading synced JSON files (updated hourly via Action).</div>
 <main>
   <div class="card" id="leftCard">
     <h2>Free Top 10 — by AA Intelligence</h2>
-    <div class="sub">Universe: OR free (<code>prompt==0 && completion==0 && tools</code>) + OpenCode <code>*-free</code> deduped. Rank = AA Intelligence Index. <span id="leftMeta" class="small"></span></div>
+    <div class="sub">Universe: OR free (<code>prompt==0 && completion==0 && tools</code>) + OpenCode free deduped. <span id="leftMeta" class="small"></span></div>
     <div id="leftBody">Loading…</div>
     <div id="leftFoot" class="small" style="margin-top:8px"></div>
   </div>
   <div class="card" id="rightCard">
     <h2>All Models — Value & Frontier</h2>
-    <div class="sub">Derived cost/task = blended × 10K/1M (same as AA graph). <span id="rightMeta" class="small"></span></div>
+    <div class="sub">Derived cost/task = blended × 10K/1M (matches AA scatter). <span id="rightMeta" class="small"></span></div>
     <div class="right-controls">
       <label>Min intel <input id="intelThresh" type="range" min="0" max="60" step="5" value="40"><span id="threshVal">40</span></label>
       <div class="toggle" id="modeToggle">
@@ -84,15 +87,15 @@ a:hover{text-decoration:underline}
     <div id="rightBody">Loading…</div>
   </div>
   <div class="card scatter-wrap">
-    <h2>Scatter — Intelligence vs Cost per Task <span class="small">(derived; x log scale)</span></h2>
-    <div class="small" style="margin-bottom:6px">Gray = all AA. <span style="color:var(--accent)">● Free Top 10</span> · <span style="color:var(--gold)">● Right Top 10</span> · 🆓 = free twin exists. Hover for details. Replicates <a href="https://artificialanalysis.ai/?cost=intelligence-vs-cost-per-task" target="_blank">AA intelligence-vs-cost-per-task</a> frontier from live data.</div>
+    <h2>Scatter — Intelligence vs Cost per Task <span class="small">(log scale)</span></h2>
+    <div class="small" style="margin-bottom:6px">Gray = all AA. <span style="color:var(--accent)">● Free Top 10</span> · <span style="color:var(--gold)">● Right Top 10</span> · 🆓 = free twin exists. Hover for details; click dot to view model on AA.</div>
     <canvas id="scatter" width="1200" height="420"></canvas>
     <div id="scatterTip" class="small" style="margin-top:6px;min-height:14px"></div>
   </div>
 </main>
 <script>
 const LS_KEY="AA_API_KEY";
-const LS_CACHE="aa_or_cache_v2";
+const LS_CACHE="aa_or_cache_v3";
 const CACHE_TTL_MS=6*60*60*1000;
 const TOKENS_PER_TASK=10000;
 
@@ -135,6 +138,10 @@ function getDataAgeBadge(){
   return `<span class="badge ${cls}">data: ${hours}h ago</span>`;
 }
 
+function updateFreshnessHeader(){
+  el('dataAgeHeader').outerHTML = `<span id="dataAgeHeader">${getDataAgeBadge()}</span>`;
+}
+
 async function fetchJSON(url, opts={}){
   const r=await fetch(url, opts);
   if(!r.ok) throw new Error(url+" → "+r.status+" "+r.statusText);
@@ -147,12 +154,12 @@ function saveCache(data){ localStorage.setItem(LS_CACHE, JSON.stringify({ts:Date
 
 async function fetchLocalJSON(path){
   try{
-    // Append timestamp to prevent GitHub Pages aggressive browser caching
     const r=await fetch(path + (path.includes('?') ? '&' : '?') + 't=' + Date.now(), {cache:"no-store"});
     if(!r.ok) return null;
     const modHeader = r.headers.get("Last-Modified");
     if(modHeader && !lastDataTime){
       lastDataTime = new Date(modHeader);
+      updateFreshnessHeader();
     }
     const j=await r.json();
     return j.data||j;
@@ -167,18 +174,16 @@ async function fetchORModels(){
 }
 
 async function fetchOpencodeModels(){
-  // 1. Try local file saved hourly by GitHub Actions
   const local=await fetchLocalJSON("./opencode_models.json");
   if(local){
     const list = local.models || local.data || local;
     if(Array.isArray(list) && list.length>0) return list;
   }
-  // 2. Fallback to live API fetch
   try{
     const j=await fetchJSON("https://opencode.ai/zen/v1/models");
     return j.data||j.models||j;
   }catch(e){
-    log("Opencode live fetch failed (CORS/offline?) — continuing with OR+AA only.");
+    log("Opencode live fetch skipped — continuing with OR+AA data.");
     return [];
   }
 }
@@ -193,7 +198,7 @@ async function fetchAA(force=false){
     return local;
   }
   const key=getAAKey();
-  if(!key) throw new Error("AA_API_KEY missing and no ./aa_models.json found — run the GitHub Action to generate json files or paste key above.");
+  if(!key) throw new Error("AA_API_KEY missing and no ./aa_models.json found — please run the GitHub Action or paste your key above.");
   const j=await fetchJSON("https://artificialanalysis.ai/api/v2/data/llms/models", {headers:{"X-API-Key":key}});
   const data=j.data||j;
   const existing=loadCache()||{};
@@ -219,48 +224,63 @@ async function fetchUptimeFor(ids){
 function buildFreeUniverse(orModels, opModels){
   const orFreeAll = orModels.filter(m=> m.pricing && m.pricing.prompt==="0" && m.pricing.completion==="0");
   const orFreeTools = orFreeAll.filter(m=> (m.supported_parameters||[]).includes("tools"));
-  const opFreeIds = (opModels||[]).map(m=> m.id||m.slug).filter(id=> /-free$/.test(id) || id==="big-pickle");
+  const opFreeIds = (opModels||[]).map(m=> m.id||m.slug).filter(id=> id && (/-free$/.test(id) || id==="big-pickle"));
   const freeIds = new Set([...orFreeTools.map(m=>m.id), ...opFreeIds]);
   return {orFreeAll, orFreeTools, opFreeIds, freeIds, orMap: new Map(orModels.map(m=>[m.id,m]))};
 }
 
-function toBaseSlug(id){
-  let s=id.split("/").pop().split(":")[0];
-  s=s.replace(/-free$/,"");
-  s=s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-  return s;
-}
-
+// Manual explicit overrides for models that diverge completely in naming
 const FREE_AA_MAP={
   "z-ai/glm-5.2:free":"glm-5-2",
   "minimax/minimax-m3:free":"minimax-m3",
+  "minimax/minimax-m2.7:free":"minimax-m2-7",
   "thinkingmachines/inkling:free":"inkling",
   "thinkingmachines/inkling-small:free":"inkling-small",
-  "minimax/minimax-m2.7:free":"minimax-m2-7",
   "nvidia/nemotron-3-ultra-550b-a55b:free":"nvidia-nemotron-3-ultra-550b-a55b",
+  "nvidia/nemotron-3-super-120b-a12b:free":"nvidia-nemotron-3-super-120b-a12b",
+  "nvidia/nemotron-3.5-lightning:free":"nemotron-3-5-lightning",
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free":"nemotron-3-nano-omni-30b-a3b",
   "inclusionai/ling-3.0-flash-fin:free":"ling-3-0-flash",
   "google/gemma-4-31b-it:free":"gemma-4-31b",
   "google/gemma-4-26b-a4b-it:free":"gemma-4-26b-a4b",
-  "nvidia/nemotron-3-super-120b-a12b:free":"nvidia-nemotron-3-super-120b-a12b",
-  "nvidia/nemotron-3.5-lightning:free":"nemotron-3-5-lightning",
   "cohere/north-mini-code:free":"north-mini-code",
-  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free":"nemotron-3-nano-omni-30b-a3b",
   "muse-spark-1.3-contributor-free":"muse-spark-1-3",
   "muse-spark-1.3-free":"muse-spark-1-3",
   "muse-spark-1.2-contributor-free":"muse-spark-1-2",
   "muse-spark-1.2-free":"muse-spark-1-2",
-  "deepseek-v4-flash-free":"deepseek-v4-flash",
   "mimo-v2.5-free":"mimo-v2-5-0424",
-  "nemotron-3-ultra-free":"nvidia-nemotron-3-ultra-550b-a55b",
-  "nemotron-3.5-lightning-free":"nemotron-3-5-lightning",
-  "ling-3.0-flash-fin-free":"ling-3-0-flash",
-  "laguna-s-2.1-free":null,
-  "poolside/laguna-s-2.1:free":null,
-  "poolside/laguna-xs-2.1:free":null,
-  "dots-studio/dots-3-note-preview:free":null,
-  "liquid/lfm-2.5-2.6b:free":null,
-  "big-pickle":null,
+  "ling-3.0-flash-fin-free":"ling-3-0-flash"
 };
+
+// Fuzzy matcher that maps OpenRouter / OpenCode IDs to Artificial Analysis slugs automatically
+function findAAMatch(rawId, aaBySlug){
+  if(!rawId) return {slug:null, model:null};
+  if(FREE_AA_MAP[rawId]){
+    const s=FREE_AA_MAP[rawId];
+    return {slug:s, model:aaBySlug.get(s)||null};
+  }
+  let s = rawId.toLowerCase()
+    .split("/").pop()
+    .split(":")[0]
+    .replace(/-free$/,"")
+    .replace(/-contributor$/,"")
+    .replace(/-(it|instruct|chat|preview|hf|fin)$/,"")
+    .replace(/\./g,"-")
+    .replace(/[^a-z0-9]+/g,"-")
+    .replace(/^-|-$/g,"");
+
+  if(aaBySlug.has(s)) return {slug:s, model:aaBySlug.get(s)};
+  
+  // Try strip common vendor prefix if joined by dash
+  const noVendor = s.replace(/^(google|meta|nvidia|deepseek|qwen|mistral|openai|anthropic)-/,"");
+  if(aaBySlug.has(noVendor)) return {slug:noVendor, model:aaBySlug.get(noVendor)};
+
+  // Check prefix / stripped match
+  for(const [aaSlug, model] of aaBySlug.entries()){
+    if(aaSlug.replace(/-/g,"") === s.replace(/-/g,"")) return {slug:aaSlug, model};
+  }
+  return {slug:s, model:null};
+}
 
 let currentLeft=[], currentRight=[], currentAA=[], currentFreeSet=new Set();
 let rightThresh=40, rightMode="value";
@@ -271,8 +291,8 @@ function sortTable(tableId, colIdx, dir){
   if(!tbody) return;
   const rows=[...tbody.querySelectorAll("tr")];
   rows.sort((a,b)=>{
-    const av=a.children[colIdx].dataset.sort || a.children[colIdx].textContent;
-    const bv=b.children[colIdx].dataset.sort || b.children[colIdx].textContent;
+    const av=a.children[colIdx]?.dataset.sort || a.children[colIdx]?.textContent || "";
+    const bv=b.children[colIdx]?.dataset.sort || b.children[colIdx]?.textContent || "";
     const an=parseFloat(av), bn=parseFloat(bv);
     const bothNum=!isNaN(an) && !isNaN(bn) && av!=="N/A" && bv!=="N/A";
     let cmp = bothNum ? an-bn : String(av).localeCompare(String(bv));
@@ -287,7 +307,9 @@ function makeSortable(tableId){
   ths.forEach((th,idx)=>{
     let dir="desc";
     th.onclick=()=>{
+      ths.forEach(t=>t.classList.remove('sorted-asc','sorted-desc'));
       dir = dir==="desc"?"asc":"desc";
+      th.classList.add(dir==="asc"?'sorted-asc':'sorted-desc');
       sortTable(tableId, idx, dir);
     };
   });
@@ -306,47 +328,44 @@ function computeFrontier(candidates){
   return frontier.sort((a,b)=> b.intel - a.intel);
 }
 
-function renderLeft(freeTools, aaBySlug, uptimeMap){
+function renderLeft(freeTools, opModels, aaBySlug, uptimeMap){
   const rows = freeTools.map(m=>{
     const id=m.id;
-    const aaSlug=FREE_AA_MAP[id] || toBaseSlug(id);
-    const aa = aaSlug ? aaBySlug.get(aaSlug) : null;
-    const intel = aa ? aa.evaluations?.artificial_analysis_intelligence_index : null;
-    const code = aa ? aa.evaluations?.artificial_analysis_coding_index : null;
-    return {id, ctx:m.context_length, provider: m.id.split("/")[0], aaSlug, intel, code, uptime: uptimeMap[id]||null};
+    const match = findAAMatch(id, aaBySlug);
+    const aa = match.model;
+    const intel = aa?.evaluations?.artificial_analysis_intelligence_index ?? null;
+    const code = aa?.evaluations?.artificial_analysis_coding_index ?? null;
+    return {id, ctx:m.context_length||0, provider: m.id.split("/")[0], aaSlug:match.slug, intel, code, uptime: uptimeMap[id]||null};
   });
 
-  const opOnly = [
-    "muse-spark-1.3-contributor-free",
-    "muse-spark-1.2-contributor-free",
-    "deepseek-v4-flash-free",
-    "mimo-v2.5-free",
-    "nemotron-3-ultra-free",
-    "nemotron-3.5-lightning-free",
-    "ling-3.0-flash-fin-free",
-    "laguna-s-2.1-free",
-    "big-pickle"
-  ];
+  const ctxMap={
+    "muse-spark-1.3-contributor-free":1048576,
+    "muse-spark-1.2-contributor-free":1048576,
+    "deepseek-v4-flash-free":1048576,
+    "mimo-v2.5-free":262144,
+    "nemotron-3-ultra-free":1000000,
+    "nemotron-3.5-lightning-free":1000000,
+    "ling-3.0-flash-fin-free":262144,
+    "laguna-s-2.1-free":262144,
+    "big-pickle":200000
+  };
+
   const existingIds=new Set(rows.map(r=>r.id));
-  for(const oid of opOnly){
-    if(existingIds.has(oid)) continue;
-    const aaSlug=FREE_AA_MAP[oid] || toBaseSlug(oid);
-    const aa=aaSlug?aaBySlug.get(aaSlug):null;
-    const intel=aa?aa.evaluations?.artificial_analysis_intelligence_index:null;
-    const code=aa?aa.evaluations?.artificial_analysis_coding_index:null;
-    const ctxMap={
-      "muse-spark-1.3-contributor-free":1048576,
-      "muse-spark-1.2-contributor-free":1048576,
-      "deepseek-v4-flash-free":1048576,
-      "mimo-v2.5-free":262144,
-      "nemotron-3-ultra-free":1000000,
-      "nemotron-3.5-lightning-free":1000000,
-      "ling-3.0-flash-fin-free":262144,
-      "laguna-s-2.1-free":262144,
-      "big-pickle":200000
-    };
-    rows.push({id:oid, ctx:ctxMap[oid]||0, provider:"opencode", aaSlug, intel, code, uptime:null});
-  }
+
+  // Dynamically ingest all OpenCode free models
+  (opModels||[]).forEach(om=>{
+    const oid = om.id || om.slug;
+    if(!oid || existingIds.has(oid)) return;
+    if(!/-free$/.test(oid) && oid!=="big-pickle") return;
+    existingIds.add(oid);
+
+    const match = findAAMatch(oid, aaBySlug);
+    const aa = match.model;
+    const intel = aa?.evaluations?.artificial_analysis_intelligence_index ?? null;
+    const code = aa?.evaluations?.artificial_analysis_coding_index ?? null;
+    const ctx = om.context_length || om.context_window || ctxMap[oid] || 0;
+    rows.push({id:oid, ctx, provider:"opencode", aaSlug:match.slug, intel, code, uptime:null});
+  });
 
   rows.sort((a,b)=>{
     if(a.intel==null && b.intel==null) return 0;
@@ -370,7 +389,6 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
   const freeSlugs=new Set();
   for(const r of rows){
     if(r.aaSlug) freeSlugs.add(r.aaSlug);
-    freeSlugs.add(toBaseSlug(r.id));
   }
   currentFreeSet = freeSlugs;
 
@@ -379,7 +397,8 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
     const ctxK = r.ctx ? Math.round(r.ctx/1024)+"K" : "—";
     const up = r.uptime ? r.uptime.u1d : null;
     const prov = r.provider==="opencode" ? `<span class="pill">OpenCode</span>` : `<span class="pill">${r.provider}</span>` + (r.uptime?` <span class="small">${r.uptime.provider}</span>`:"");
-    html+=`<tr><td class="rank">${i+1}</td><td class="mono">${r.id}${r.aaSlug?`<div class="small">↳ ${r.aaSlug}</div>`:""}</td><td data-sort="${r.intel??-1}">${fmtIntel(r.intel)}</td><td data-sort="${r.code??-1}">${r.code!=null?Number(r.code).toFixed(1):"N/A"}</td><td data-sort="${r.ctx||0}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
+    const link = r.aaSlug ? `<a href="https://artificialanalysis.ai/models/${r.aaSlug}" target="_blank">${r.id}</a>` : r.id;
+    html+=`<tr><td class="rank">${i+1}</td><td class="mono">${link}${r.aaSlug?`<div class="small">↳ ${r.aaSlug}</div>`:""}</td><td data-sort="${r.intel??-1}">${fmtIntel(r.intel)}</td><td data-sort="${r.code??-1}">${r.code!=null?Number(r.code).toFixed(1):"N/A"}</td><td data-sort="${r.ctx||0}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
   });
   html+='</tbody></table>';
   el('leftBody').innerHTML=html;
@@ -387,7 +406,7 @@ function renderLeft(freeTools, aaBySlug, uptimeMap){
 
   const unbench = rows.filter(r=>r.intel==null).map(r=>r.id);
   el('leftFoot').innerHTML = unbench.length ? `Unbenchmarked free (N/A): ${unbench.map(s=>`<code>${s}</code>`).join(" · ")}` : "";
-  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rows.length} free evaluated`;
+  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rows.length} free models evaluated`;
 }
 
 function renderRight(aaList){
@@ -418,22 +437,23 @@ function applyRightFilters(){
   } else {
     const frontier=computeFrontier(filtered);
     display=frontier.slice(0,10);
-    hint=`Frontier: Pareto (no cheaper+smarter) among ≥${thresh} intel — ${frontier.length} frontier models`;
+    hint=`Frontier: Pareto optimal (≥${thresh} intel) — ${frontier.length} frontier models`;
   }
   currentRight=display;
 
   const isValue = rightMode==="value";
   let html=`<table id="rightTable"><thead><tr><th>#</th><th>Model</th><th>AA Intel</th><th>Price/1M</th><th>Cost/task*</th><th>${isValue?"Value":"Price"}</th><th>Ctx</th><th></th></tr></thead><tbody>`;
   display.forEach((r,i)=>{
-    const isFreeTwin = currentFreeSet.has(r.slug) || currentFreeSet.has(toBaseSlug(r.slug));
-    const twinIcon = isFreeTwin ? `<span class="pill free" title="Also available free as ${r.slug}-free">🆓 free twin</span>` : "";
+    const isFreeTwin = currentFreeSet.has(r.slug);
+    const twinIcon = isFreeTwin ? `<span class="pill free" title="Free version available">🆓 free twin</span>` : "";
     const ctxK = r.ctx ? Math.round(r.ctx/1024)+"K" : "—";
     const sortVal = isValue ? r.value : r.price;
     const showVal = isValue ? r.value.toFixed(1) : fmtPrice(r.price);
-    html+=`<tr><td class="rank">${i+1}</td><td class="mono">${r.slug}<div class="small">${r.provider}</div></td><td data-sort="${r.intel}">${fmtIntel(r.intel)}</td><td data-sort="${r.price}">${fmtPrice(r.price)}</td><td data-sort="${r.costPerTask}">${fmtCostPerTask(r.price)}</td><td data-sort="${sortVal}">${showVal}</td><td data-sort="${r.ctx}">${ctxK}</td><td>${twinIcon}</td></tr>`;
+    const link = `<a href="https://artificialanalysis.ai/models/${r.slug}" target="_blank">${r.slug}</a>`;
+    html+=`<tr><td class="rank">${i+1}</td><td class="mono">${link}<div class="small">${r.provider}</div></td><td data-sort="${r.intel}">${fmtIntel(r.intel)}</td><td data-sort="${r.price}">${fmtPrice(r.price)}</td><td data-sort="${r.costPerTask}">${fmtCostPerTask(r.price)}</td><td data-sort="${sortVal}">${showVal}</td><td data-sort="${r.ctx}">${ctxK}</td><td>${twinIcon}</td></tr>`;
   });
   html+='</tbody></table>';
-  html+=`<div class="small" style="margin-top:6px">* derived at ${TOKENS_PER_TASK.toLocaleString()} tok/task (blended 3:1). ${isValue? "Value = intel/price." : "Frontier sorted by intel; dominated models hidden."} Click headers to sort.</div>`;
+  html+=`<div class="small" style="margin-top:6px">* derived at ${TOKENS_PER_TASK.toLocaleString()} tok/task (blended 3:1). Click headers to sort.</div>`;
   el('rightBody').innerHTML=html;
   makeSortable('rightTable');
   el('rightMeta').textContent = `— ${hint}`;
@@ -451,7 +471,7 @@ function drawScatter(){
   ctx.scale(dpr,dpr);
   const W=rect.width, H=420;
   ctx.clearRect(0,0,W,H);
-  if(!currentAA.length){ ctx.fillStyle="#9aa0b0"; ctx.fillText("No data yet — load AA.", 12, 20); return; }
+  if(!currentAA.length){ ctx.fillStyle="#9aa0b0"; ctx.fillText("No data loaded yet.", 12, 20); return; }
   const pts = currentAA.filter(p=> p.price>0 && p.intel!=null);
   if(!pts.length) return;
   const xs = pts.map(p=> p.costPerTask);
@@ -460,46 +480,64 @@ function drawScatter(){
   const yMin=Math.min(...ys)-2, yMax=Math.max(...ys)+2;
   const logMin=Math.log10(Math.max(xMin, 1e-4));
   const logMax=Math.log10(xMax);
-  const pad={l:48,r:12,t:12,b:28};
+  const pad={l:52,r:16,t:16,b:28};
   function xToPx(cost){ const lv=Math.log10(Math.max(cost,1e-4)); return pad.l + (lv-logMin)/(logMax-logMin)*(W-pad.l-pad.r); }
   function yToPx(intel){ return H-pad.b - (intel - yMin)/(yMax - yMin)*(H-pad.t-pad.b); }
+  
+  // Grid lines
   ctx.strokeStyle="#1e222b"; ctx.lineWidth=1;
   for(let i=0;i<=4;i++){
     const y=pad.t + i*(H-pad.t-pad.b)/4;
     ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
   }
+  // Major log ticks
+  const tickValues = [0.0001, 0.001, 0.01, 0.1, 1.0, 10.0].filter(v => v >= xMin*0.5 && v <= xMax*2);
+  ctx.fillStyle="#9aa0b0"; ctx.font="10px ui-monospace, monospace";
+  for(const tv of tickValues){
+    const x = xToPx(tv);
+    if(x >= pad.l && x <= W-pad.r){
+      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, H-pad.b); ctx.stroke();
+      ctx.fillText(`$${tv >= 0.01 ? tv.toFixed(2) : tv.toFixed(4)}`, x - 15, H - 10);
+    }
+  }
+
   ctx.fillStyle="#9aa0b0"; ctx.font="11px system-ui";
   ctx.fillText(`intel ${yMax.toFixed(0)}`, 4, pad.t+10);
   ctx.fillText(`intel ${yMin.toFixed(0)}`, 4, H-pad.b-4);
-  ctx.fillText(`cost/task $${xMin.toFixed(4)}`, pad.l, H-8);
-  ctx.fillText(`$${xMax.toFixed(2)}`, W-pad.r-60, H-8);
+
+  // Background dots
   for(const p of pts){
     const x=xToPx(p.costPerTask), y=yToPx(p.intel);
     const isDim = p.intel < rightThresh;
-    ctx.fillStyle= isDim ? "#1a1d23" : "#3a4152";
-    ctx.beginPath(); ctx.arc(x,y,2.2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle= isDim ? "#16191f" : "#323846";
+    ctx.beginPath(); ctx.arc(x,y,2.4,0,Math.PI*2); ctx.fill();
   }
+
+  // Free Top 10 highlights (Blue)
   const leftSlugs=new Set(currentLeft.map(r=>r.aaSlug).filter(Boolean));
   for(const p of pts){
     if(leftSlugs.has(p.slug)){
       const x=xToPx(p.costPerTask), y=yToPx(p.intel);
       ctx.fillStyle="#6aa9ff";
-      ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle="#0f1115"; ctx.lineWidth=1; ctx.stroke();
     }
   }
+
+  // Right Top 10 highlights (Gold / Green border)
   const rightSlugs=new Set(currentRight.map(r=>r.slug));
   for(const p of pts){
     if(rightSlugs.has(p.slug)){
       const x=xToPx(p.costPerTask), y=yToPx(p.intel);
       ctx.fillStyle="#f39c12";
-      ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2); ctx.fill();
       ctx.strokeStyle="#0f1115"; ctx.lineWidth=1; ctx.stroke();
       if(currentFreeSet.has(p.slug)) {
-        ctx.strokeStyle="#8fdb8f"; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.stroke();
+        ctx.strokeStyle="#8fdb8f"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(x,y,6.5,0,Math.PI*2); ctx.stroke();
       }
     }
   }
+
   canvas.onmousemove=(e)=>{
     const r=canvas.getBoundingClientRect();
     const mx=(e.clientX-r.left), my=(e.clientY-r.top);
@@ -507,15 +545,16 @@ function drawScatter(){
     for(const p of pts){
       const x=xToPx(p.costPerTask), y=yToPx(p.intel);
       const d=Math.hypot(x-mx,y-my);
-      if(d<10 && d<bestD){ bestD=d; best=p; }
+      if(d<12 && d<bestD){ bestD=d; best=p; }
     }
     if(best){
-      const freeFlag = currentFreeSet.has(best.slug) ? " 🆓 free twin" : "";
+      const freeFlag = currentFreeSet.has(best.slug) ? " 🆓 free twin available" : "";
       const v = (best.intel/best.price).toFixed(1);
       el('scatterTip').textContent = `${best.slug} — intel ${best.intel.toFixed(1)} · ${fmtPrice(best.price)} · cost/task ${fmtCostPerTask(best.price)} · value ${v}${freeFlag}`;
       canvas.style.cursor="pointer";
     } else { el('scatterTip').textContent=""; canvas.style.cursor="default"; }
   };
+  canvas.onmouseleave=()=>{ el('scatterTip').textContent=""; };
   canvas.onclick=(e)=>{
     const r=canvas.getBoundingClientRect();
     const mx=(e.clientX-r.left), my=(e.clientY-r.top);
@@ -523,7 +562,7 @@ function drawScatter(){
     for(const p of pts){
       const x=xToPx(p.costPerTask), y=yToPx(p.intel);
       const d=Math.hypot(x-mx,y-my);
-      if(d<10 && d<bestD){ bestD=d; best=p; }
+      if(d<12 && d<bestD){ bestD=d; best=p; }
     }
     if(best) window.open("https://artificialanalysis.ai/models/"+best.slug, "_blank");
   };
@@ -531,7 +570,7 @@ function drawScatter(){
 
 async function buildAll(force=false){
   clearErr();
-  log("Fetching (local-first) OR + OpenCode + AA…");
+  log("Fetching data (local-first OR + OpenCode + AA)…");
   el('leftBody').textContent="Loading…";
   el('rightBody').textContent="Loading…";
   try{
@@ -543,12 +582,12 @@ async function buildAll(force=false){
     const {orFreeTools} = buildFreeUniverse(orData, opData);
     const aaBySlug=new Map();
     for(const m of aaData){ if(m.slug) aaBySlug.set(m.slug, m); }
-    log(`Fetched ${orData.length} OR models, ${opData.length} OpenCode, ${aaData.length} AA. Fetching uptime…`);
+    log(`Loaded ${orData.length} OR models, ${opData.length} OpenCode, ${aaData.length} AA. Fetching uptime…`);
     const uptimeIds = orFreeTools.map(m=>m.id).slice(0,22);
     const uptimeMap = await fetchUptimeFor(uptimeIds);
-    renderLeft(orFreeTools, aaBySlug, uptimeMap);
+    renderLeft(orFreeTools, opData, aaBySlug, uptimeMap);
     renderRight(aaData);
-    log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} OpenCode, ${aaData.length} AA. Updated ${new Date().toLocaleTimeString()}. Click headers to sort.`);
+    log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} OpenCode, ${aaData.length} AA. Updated ${new Date().toLocaleTimeString()}.`);
   }catch(e){
     showErr(String(e.message||e));
     el('leftBody').textContent="Failed — see error above.";
