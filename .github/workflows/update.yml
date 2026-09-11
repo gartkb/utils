@@ -31,11 +31,108 @@ jobs:
         run: |
           curl -s "https://opencode.ai/zen/v1/models" -o top10-aa/opencode_models.json
 
+      - name: Build picker status (models.dev) + prune deprecated
+        run: |
+          python3 << 'PY'
+          import json, sys, urllib.request, datetime
+          OP_PATH = "top10-aa/opencode_models.json"
+          STATUS_PATH = "top10-aa/opencode_status.json"
+          # Picker truth: models.dev opencode provider. Shown in /models iff active.
+          # Zen /v1/models has no status field (e.g. deepseek-v4-flash-free still listed but deprecated).
+          try:
+              with urllib.request.urlopen("https://models.dev/api.json", timeout=60) as r:
+                  raw = r.read()
+          except Exception as e:
+              print(f"::warning::models.dev fetch failed ({e}), keeping existing files")
+              sys.exit(0)
+          if len(raw) < 1_000_000:
+              print(f"::warning::models.dev download suspiciously small ({len(raw)} bytes), keeping existing files")
+              sys.exit(0)
+          try:
+              md = json.loads(raw)
+          except Exception as e:
+              print(f"::warning::models.dev JSON parse failed ({e}), keeping existing files")
+              sys.exit(0)
+          op_md = (md.get("opencode") or {}).get("models") or {}
+          if not op_md:
+              print("::warning::models.dev opencode provider missing/empty, keeping existing files")
+              sys.exit(0)
+
+          def is_free(mid, m):
+              cost = m.get("cost") or {}
+              ci, co = cost.get("input"), cost.get("output")
+              if isinstance(ci, (int, float)) and isinstance(co, (int, float)) and ci == 0 and co == 0:
+                  return True
+              return mid.endswith("-free") or mid in ("big-pickle", "grok-code")
+
+          status_map = {}
+          unknown_statuses = set()
+          for key, m in op_md.items():
+              mid = m.get("id") or key
+              if not is_free(mid, m):
+                  continue
+              st = m.get("status")
+              if st is None or st == "active":
+                  active = True
+              elif st == "deprecated":
+                  active = False
+              else:
+                  active = False  # unknown status => hide from picker, but warn loudly
+                  unknown_statuses.add(str(st))
+              lim = m.get("limit") or {}
+              status_map[mid] = {
+                  "status": st or "active",
+                  "active": active,
+                  "context": lim.get("context"),
+                  "cost": m.get("cost"),
+              }
+          if unknown_statuses:
+              print(f"::warning::models.dev has new status values {sorted(unknown_statuses)} — treated as picker-hidden, update mapping if wrong")
+          if not status_map:
+              print("::warning::no free models parsed, keeping existing files")
+              sys.exit(0)
+          out = {
+              "updated_utc": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%MZ"),
+              "source": "https://models.dev/api.json (opencode provider)",
+              "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
+              "free": status_map,
+          }
+          with open(STATUS_PATH, "w") as f:
+              json.dump(out, f, indent=2)
+          # Prune picker-hidden frees from the Zen snapshot so the current page
+          # (which only reads opencode_models.json) drops them with zero HTML edits.
+          # Only removes ids explicitly inactive; unknown ids are never invented here.
+          try:
+              with open(OP_PATH) as f:
+                  op = json.load(f)
+          except Exception as e:
+              print(f"::warning::cannot read {OP_PATH} ({e}), skipping prune")
+              sys.exit(0)
+          if isinstance(op, dict) and isinstance(op.get("data"), list):
+              lst, container = op["data"], "data"
+          elif isinstance(op, dict) and isinstance(op.get("models"), list):
+              lst, container = op["models"], "models"
+          elif isinstance(op, list):
+              lst, container = op, None
+          else:
+              print("::warning::unexpected opencode_models.json shape, skipping prune")
+              sys.exit(0)
+          hidden_ids = {mid for mid, s in status_map.items() if not s["active"]}
+          pruned = [m for m in lst if (m.get("id") or m.get("slug")) not in hidden_ids]
+          if container:
+              op[container] = pruned
+          else:
+              op = pruned
+          with open(OP_PATH, "w") as f:
+              json.dump(op, f, indent=2)
+          print(f"status entries={len(status_map)} pruned={len(lst)-len(pruned)} remaining={len(pruned)}")
+          PY
+
       - name: Commit if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add top10-aa/aa_models.json top10-aa/or_models.json top10-aa/opencode_models.json
+          git add top10-aa/aa_models.json top10-aa/or_models.json top10-aa/opencode_models.json top10-aa/opencode_status.json
           if ! git diff --staged --quiet; then
             git commit -m "chore: update model data $(date -u +%Y-%m-%dT%H:%MZ)"
             git push
