@@ -95,7 +95,7 @@ a:hover{text-decoration:underline}
 </main>
 <script>
 const LS_KEY="AA_API_KEY";
-const LS_CACHE="aa_or_cache_v3";
+const LS_CACHE="aa_or_cache_v4";
 const CACHE_TTL_MS=6*60*60*1000;
 const TOKENS_PER_TASK=10000;
 
@@ -188,6 +188,22 @@ async function fetchOpencodeModels(){
   }
 }
 
+// Picker truth from Action (models.dev): {updated_utc, free: {id: {status, active, context}}}
+// Missing/404 => null and page falls back to previous behavior.
+let pickerStatus = null;
+async function fetchPickerStatus(){
+  try{
+    const r=await fetch("./opencode_status.json?t="+Date.now(), {cache:"no-store"});
+    if(!r.ok) return null;
+    const j=await r.json();
+    pickerStatus = j;
+    return j;
+  }catch{ return null; }
+}
+function pickerInfo(id){
+  return (pickerStatus && pickerStatus.free && pickerStatus.free[id]) || null;
+}
+
 async function fetchAA(force=false){
   const cached=loadCache();
   if(!force && cached && cached.aa) return cached.aa;
@@ -224,7 +240,7 @@ async function fetchUptimeFor(ids){
 function buildFreeUniverse(orModels, opModels){
   const orFreeAll = orModels.filter(m=> m.pricing && m.pricing.prompt==="0" && m.pricing.completion==="0");
   const orFreeTools = orFreeAll.filter(m=> (m.supported_parameters||[]).includes("tools"));
-  const opFreeIds = (opModels||[]).map(m=> m.id||m.slug).filter(id=> id && (/-free$/.test(id) || id==="big-pickle"));
+  const opFreeIds = (opModels||[]).map(m=> m.id||m.slug).filter(id=> id && (/-free$/.test(id) || id==="big-pickle" || id==="grok-code"));
   const freeIds = new Set([...orFreeTools.map(m=>m.id), ...opFreeIds]);
   return {orFreeAll, orFreeTools, opFreeIds, freeIds, orMap: new Map(orModels.map(m=>[m.id,m]))};
 }
@@ -249,7 +265,8 @@ const FREE_AA_MAP={
   "muse-spark-1.2-contributor-free":"muse-spark-1-2",
   "muse-spark-1.2-free":"muse-spark-1-2",
   "mimo-v2.5-free":"mimo-v2-5-0424",
-  "ling-3.0-flash-fin-free":"ling-3-0-flash"
+  "ling-3.0-flash-fin-free":"ling-3-0-flash",
+  "nemotron-3-ultra-free":"nvidia-nemotron-3-ultra-550b-a55b"
 };
 
 // Fuzzy matcher that maps OpenRouter / OpenCode IDs to Artificial Analysis slugs automatically
@@ -270,7 +287,7 @@ function findAAMatch(rawId, aaBySlug){
     .replace(/^-|-$/g,"");
 
   if(aaBySlug.has(s)) return {slug:s, model:aaBySlug.get(s)};
-  
+
   // Try strip common vendor prefix if joined by dash
   const noVendor = s.replace(/^(google|meta|nvidia|deepseek|qwen|mistral|openai|anthropic)-/,"");
   if(aaBySlug.has(noVendor)) return {slug:noVendor, model:aaBySlug.get(noVendor)};
@@ -352,19 +369,24 @@ function renderLeft(freeTools, opModels, aaBySlug, uptimeMap){
 
   const existingIds=new Set(rows.map(r=>r.id));
 
-  // Dynamically ingest all OpenCode free models
+  // Dynamically ingest all OpenCode free models (status-aware).
+  // Action prunes deprecated from opencode_models.json already; this is defense-in-depth
+  // for stale caches / live fallback: hide ids the picker status marks active===false.
   (opModels||[]).forEach(om=>{
     const oid = om.id || om.slug;
     if(!oid || existingIds.has(oid)) return;
-    if(!/-free$/.test(oid) && oid!=="big-pickle") return;
+    if(!/-free$/.test(oid) && oid!=="big-pickle" && oid!=="grok-code") return;
+    const st = pickerInfo(oid);
+    if(st && st.active===false) return;
     existingIds.add(oid);
 
     const match = findAAMatch(oid, aaBySlug);
     const aa = match.model;
     const intel = aa?.evaluations?.artificial_analysis_intelligence_index ?? null;
     const code = aa?.evaluations?.artificial_analysis_coding_index ?? null;
-    const ctx = om.context_length || om.context_window || ctxMap[oid] || 0;
-    rows.push({id:oid, ctx, provider:"opencode", aaSlug:match.slug, intel, code, uptime:null});
+    const ctx = om.context_length || om.context_window || (st && st.context) || ctxMap[oid] || 0;
+    const picker = st ? (st.active ? "picker" : "deprecated") : "unknown";
+    rows.push({id:oid, ctx, provider:"opencode", aaSlug:match.slug, intel, code, uptime:null, picker});
   });
 
   rows.sort((a,b)=>{
@@ -396,7 +418,8 @@ function renderLeft(freeTools, opModels, aaBySlug, uptimeMap){
   distinct.forEach((r,i)=>{
     const ctxK = r.ctx ? Math.round(r.ctx/1024)+"K" : "—";
     const up = r.uptime ? r.uptime.u1d : null;
-    const prov = r.provider==="opencode" ? `<span class="pill">OpenCode</span>` : `<span class="pill">${r.provider}</span>` + (r.uptime?` <span class="small">${r.uptime.provider}</span>`:"");
+    const pickerBadge = r.provider==="opencode" ? (r.picker==="picker" ? ` <span class="pill free" title="In /models picker (keyless IP-limited, higher quota with Zen login)">✅ picker</span>` : r.picker==="deprecated" ? ` <span class="pill" title="Deprecated — hidden from /models picker">⚠️ deprecated</span>` : "") : "";
+    const prov = r.provider==="opencode" ? `<span class="pill">OpenCode</span>${pickerBadge}` : `<span class="pill">${r.provider}</span>` + (r.uptime?` <span class="small">${r.uptime.provider}</span>`:"");
     const link = r.aaSlug ? `<a href="https://artificialanalysis.ai/models/${r.aaSlug}" target="_blank">${r.id}</a>` : r.id;
     html+=`<tr><td class="rank">${i+1}</td><td class="mono">${link}${r.aaSlug?`<div class="small">↳ ${r.aaSlug}</div>`:""}</td><td data-sort="${r.intel??-1}">${fmtIntel(r.intel)}</td><td data-sort="${r.code??-1}">${r.code!=null?Number(r.code).toFixed(1):"N/A"}</td><td data-sort="${r.ctx||0}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
   });
@@ -406,7 +429,8 @@ function renderLeft(freeTools, opModels, aaBySlug, uptimeMap){
 
   const unbench = rows.filter(r=>r.intel==null).map(r=>r.id);
   el('leftFoot').innerHTML = unbench.length ? `Unbenchmarked free (N/A): ${unbench.map(s=>`<code>${s}</code>`).join(" · ")}` : "";
-  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rows.length} free models evaluated`;
+  const stAge = (pickerStatus && pickerStatus.updated_utc) ? ` · picker status ${pickerStatus.updated_utc}` : "";
+  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rows.length} free models evaluated${stAge}`;
 }
 
 function renderRight(aaList){
@@ -483,7 +507,7 @@ function drawScatter(){
   const pad={l:52,r:16,t:16,b:28};
   function xToPx(cost){ const lv=Math.log10(Math.max(cost,1e-4)); return pad.l + (lv-logMin)/(logMax-logMin)*(W-pad.l-pad.r); }
   function yToPx(intel){ return H-pad.b - (intel - yMin)/(yMax - yMin)*(H-pad.t-pad.b); }
-  
+
   // Grid lines
   ctx.strokeStyle="#1e222b"; ctx.lineWidth=1;
   for(let i=0;i<=4;i++){
@@ -579,6 +603,7 @@ async function buildAll(force=false){
       fetchOpencodeModels(),
       fetchAA(force)
     ]);
+    await fetchPickerStatus();
     const {orFreeTools} = buildFreeUniverse(orData, opData);
     const aaBySlug=new Map();
     for(const m of aaData){ if(m.slug) aaBySlug.set(m.slug, m); }
@@ -587,7 +612,11 @@ async function buildAll(force=false){
     const uptimeMap = await fetchUptimeFor(uptimeIds);
     renderLeft(orFreeTools, opData, aaBySlug, uptimeMap);
     renderRight(aaData);
-    log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} OpenCode, ${aaData.length} AA. Updated ${new Date().toLocaleTimeString()}.`);
+    {
+      const nStatus = pickerStatus && pickerStatus.free ? Object.keys(pickerStatus.free).length : 0;
+      const nActive = pickerStatus && pickerStatus.free ? Object.values(pickerStatus.free).filter(v=>v && v.active).length : 0;
+      log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} OpenCode, ${aaData.length} AA${nStatus?`, picker ${nActive}/${nStatus} active`:""}. Updated ${new Date().toLocaleTimeString()}.`);
+    }
   }catch(e){
     showErr(String(e.message||e));
     el('leftBody').textContent="Failed — see error above.";
