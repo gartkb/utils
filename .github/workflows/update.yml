@@ -39,8 +39,14 @@ jobs:
           STATUS_PATH = "top10-aa/opencode_status.json"
           # Picker truth: models.dev opencode provider. Shown in /models iff active.
           # Zen /v1/models has no status field (e.g. deepseek-v4-flash-free still listed but deprecated).
+          # NOTE: models.dev sits behind Cloudflare and 403s Python's default
+          # User-Agent, so send a browser UA.
           try:
-              with urllib.request.urlopen("https://models.dev/api.json", timeout=60) as r:
+              req = urllib.request.Request(
+                  "https://models.dev/api.json",
+                  headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) top10-aa-bot", "Accept": "application/json"},
+              )
+              with urllib.request.urlopen(req, timeout=60) as r:
                   raw = r.read()
           except Exception as e:
               print(f"::warning::models.dev fetch failed ({e}), keeping existing files")
