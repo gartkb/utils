@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-17T20:40Z",
+  "updated_utc": "2026-09-18T01:56Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -185,16 +185,6 @@
       "status": "deprecated",
       "active": false,
       "context": 204800,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "union-alpha": {
-      "status": "active",
-      "active": true,
-      "context": 262144,
       "cost": {
         "input": 0,
         "output": 0,
