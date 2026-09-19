@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-19T02:01Z",
+  "updated_utc": "2026-09-19T09:51Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -101,6 +101,15 @@
         "input": 0,
         "output": 0,
         "cache_read": 0
+      }
+    },
+    "jev-1.13-free": {
+      "status": "active",
+      "active": true,
+      "context": 64000,
+      "cost": {
+        "input": 0,
+        "output": 0
       }
     },
     "muse-spark-1.2-contributor-free": {
