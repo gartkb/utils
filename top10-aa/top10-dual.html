@@ -68,8 +68,8 @@ a:hover{text-decoration:underline}
 <div id="log">Ready. Local-first: reading synced JSON files (updated hourly via Action).</div>
 <main>
   <div class="card" id="leftCard">
-    <h2>Free Top 10 — by AA Intelligence</h2>
-    <div class="sub">Universe: OR free (<code>prompt==0 && completion==0 && tools</code>) + OpenCode free deduped. <span id="leftMeta" class="small"></span></div>
+    <h2>Free Models — by AA Intelligence</h2>
+    <div class="sub">Universe: OR free (<code>prompt==0 && completion==0</code>, tools shown as badge) + OpenCode free (picker status), merged by AA model. <span id="leftMeta" class="small"></span></div>
     <div id="leftBody">Loading…</div>
     <div id="leftFoot" class="small" style="margin-top:8px"></div>
   </div>
@@ -88,7 +88,7 @@ a:hover{text-decoration:underline}
   </div>
   <div class="card scatter-wrap">
     <h2>Scatter — Intelligence vs Cost per Task <span class="small">(log scale)</span></h2>
-    <div class="small" style="margin-bottom:6px">Gray = all AA. <span style="color:var(--accent)">● Free Top 10</span> · <span style="color:var(--gold)">● Right Top 10</span> · 🆓 = free twin exists. Hover for details; click dot to view model on AA.</div>
+    <div class="small" style="margin-bottom:6px">Gray = all AA. <span style="color:var(--accent)">● Free models</span> · <span style="color:var(--gold)">● Right Top 10</span> · 🆓 = free twin exists. Hover for details; click dot to view model on AA.</div>
     <canvas id="scatter" width="1200" height="420"></canvas>
     <div id="scatterTip" class="small" style="margin-top:6px;min-height:14px"></div>
   </div>
@@ -237,12 +237,12 @@ async function fetchUptimeFor(ids){
   return out;
 }
 
-function buildFreeUniverse(orModels, opModels){
-  const orFreeAll = orModels.filter(m=> m.pricing && m.pricing.prompt==="0" && m.pricing.completion==="0");
-  const orFreeTools = orFreeAll.filter(m=> (m.supported_parameters||[]).includes("tools"));
-  const opFreeIds = (opModels||[]).map(m=> m.id||m.slug).filter(id=> id && (/-free$/.test(id) || id==="big-pickle" || id==="grok-code"));
-  const freeIds = new Set([...orFreeTools.map(m=>m.id), ...opFreeIds]);
-  return {orFreeAll, orFreeTools, opFreeIds, freeIds, orMap: new Map(orModels.map(m=>[m.id,m]))};
+// Fallback name test for OpenCode ids that opencode_status.json doesn't know about.
+function isOpencodeFreeName(id){ return /-free$/.test(id) || id==="big-pickle" || id==="grok-code"; }
+
+// All OR models priced 0/0. Tool support is shown as a badge, not used as a filter.
+function buildFreeUniverse(orModels){
+  return orModels.filter(m=> m.pricing && m.pricing.prompt==="0" && m.pricing.completion==="0" && m.id!=="openrouter/free");
 }
 
 // Manual explicit overrides for models that diverge completely in naming
@@ -256,7 +256,7 @@ const FREE_AA_MAP={
   "nvidia/nemotron-3-super-120b-a12b:free":"nvidia-nemotron-3-super-120b-a12b",
   "nvidia/nemotron-3.5-lightning:free":"nemotron-3-5-lightning",
   "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free":"nemotron-3-nano-omni-30b-a3b",
-  "inclusionai/ling-3.0-flash-fin:free":"ling-3-0-flash",
+  "inclusionai/ling-3.0-flash-fin:free":"ling-3-0-flash-fin",
   "google/gemma-4-31b-it:free":"gemma-4-31b",
   "google/gemma-4-26b-a4b-it:free":"gemma-4-26b-a4b",
   "cohere/north-mini-code:free":"north-mini-code",
@@ -265,7 +265,7 @@ const FREE_AA_MAP={
   "muse-spark-1.2-contributor-free":"muse-spark-1-2",
   "muse-spark-1.2-free":"muse-spark-1-2",
   "mimo-v2.5-free":"mimo-v2-5-0424",
-  "ling-3.0-flash-fin-free":"ling-3-0-flash",
+  "ling-3.0-flash-fin-free":"ling-3-0-flash-fin",
   "nemotron-3-ultra-free":"nvidia-nemotron-3-ultra-550b-a55b"
 };
 
@@ -281,7 +281,7 @@ function findAAMatch(rawId, aaBySlug){
     .split(":")[0]
     .replace(/-free$/,"")
     .replace(/-contributor$/,"")
-    .replace(/-(it|instruct|chat|preview|hf|fin)$/,"")
+    .replace(/-(it|instruct|chat|preview|hf)$/,"")
     .replace(/\./g,"-")
     .replace(/[^a-z0-9]+/g,"-")
     .replace(/^-|-$/g,"");
@@ -345,92 +345,77 @@ function computeFrontier(candidates){
   return frontier.sort((a,b)=> b.intel - a.intel);
 }
 
-function renderLeft(freeTools, opModels, aaBySlug, uptimeMap){
-  const rows = freeTools.map(m=>{
-    const id=m.id;
-    const match = findAAMatch(id, aaBySlug);
-    const aa = match.model;
-    const intel = aa?.evaluations?.artificial_analysis_intelligence_index ?? null;
-    const code = aa?.evaluations?.artificial_analysis_coding_index ?? null;
-    return {id, ctx:m.context_length||0, provider: m.id.split("/")[0], aaSlug:match.slug, intel, code, uptime: uptimeMap[id]||null};
-  });
-
+function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
   const ctxMap={
     "muse-spark-1.3-contributor-free":1048576,
     "muse-spark-1.2-contributor-free":1048576,
-    "deepseek-v4-flash-free":1048576,
     "mimo-v2.5-free":262144,
     "nemotron-3-ultra-free":1000000,
     "nemotron-3.5-lightning-free":1000000,
     "ling-3.0-flash-fin-free":262144,
-    "laguna-s-2.1-free":262144,
     "big-pickle":200000
   };
+  const evalOf = aa=>({
+    intel: aa?.evaluations?.artificial_analysis_intelligence_index ?? null,
+    code: aa?.evaluations?.artificial_analysis_coding_index ?? null
+  });
 
-  const existingIds=new Set(rows.map(r=>r.id));
+  // One row per (provider, id). Tools flag is a badge, not a filter.
+  const rows = orFree.map(m=>{
+    const match = findAAMatch(m.id, aaBySlug);
+    return {id:m.id, src:"or", ctx:m.context_length||0, provider:m.id.split("/")[0], aaSlug:match.slug,
+      ...evalOf(match.model), uptime:uptimeMap[m.id]||null,
+      noTools: !(m.supported_parameters||[]).includes("tools")};
+  });
 
-  // Dynamically ingest all OpenCode free models (status-aware).
-  // Action prunes deprecated from opencode_models.json already; this is defense-in-depth
-  // for stale caches / live fallback: hide ids the picker status marks active===false.
+  // OpenCode free: picker status (cost==0 upstream) is truth; name filter is fallback for ids it doesn't know.
+  // Deprecated ids are hidden (Action prunes them too; this covers stale caches / live fallback).
   (opModels||[]).forEach(om=>{
     const oid = om.id || om.slug;
-    if(!oid || existingIds.has(oid)) return;
-    if(!/-free$/.test(oid) && oid!=="big-pickle" && oid!=="grok-code") return;
+    if(!oid) return;
     const st = pickerInfo(oid);
+    if(!st && !isOpencodeFreeName(oid)) return;
     if(st && st.active===false) return;
-    existingIds.add(oid);
-
     const match = findAAMatch(oid, aaBySlug);
-    const aa = match.model;
-    const intel = aa?.evaluations?.artificial_analysis_intelligence_index ?? null;
-    const code = aa?.evaluations?.artificial_analysis_coding_index ?? null;
     const ctx = om.context_length || om.context_window || (st && st.context) || ctxMap[oid] || 0;
-    const picker = st ? (st.active ? "picker" : "deprecated") : "unknown";
-    rows.push({id:oid, ctx, provider:"opencode", aaSlug:match.slug, intel, code, uptime:null, picker});
+    rows.push({id:oid, src:"opencode", ctx, provider:"opencode", aaSlug:match.slug, ...evalOf(match.model),
+      uptime:null, picker: st ? "picker" : "unknown"});
   });
 
-  rows.sort((a,b)=>{
-    if(a.intel==null && b.intel==null) return 0;
-    if(a.intel==null) return 1;
-    if(b.intel==null) return -1;
-    return b.intel - a.intel;
-  });
-
-  const ranked = rows.filter(r=>r.intel!=null).slice(0,12);
-  const seenSlug=new Set();
-  const distinct=[];
-  for(const r of ranked){
-    const key=r.aaSlug||r.id;
-    if(seenSlug.has(key)) continue;
-    seenSlug.add(key);
-    distinct.push(r);
-    if(distinct.length>=10) break;
-  }
-  currentLeft = distinct;
-
-  const freeSlugs=new Set();
+  // Merge by AA slug so a model free on several providers is one row listing all of them.
+  const groups=new Map(), unbench=[];
   for(const r of rows){
-    if(r.aaSlug) freeSlugs.add(r.aaSlug);
+    if(r.intel==null){ unbench.push(r); continue; }
+    const g=groups.get(r.aaSlug);
+    if(g) g.rows.push(r); else groups.set(r.aaSlug,{aaSlug:r.aaSlug, intel:r.intel, code:r.code, rows:[r]});
   }
-  currentFreeSet = freeSlugs;
+  const merged=[...groups.values()].sort((a,b)=>b.intel-a.intel);
+  currentLeft = merged;
+  currentFreeSet = new Set(rows.map(r=>r.aaSlug).filter(Boolean));
 
-  let html='<table id="leftTable"><thead><tr><th>#</th><th>Model</th><th>AA Intel</th><th>Coding</th><th>Ctx</th><th>Uptime 1d</th><th>Provider</th></tr></thead><tbody>';
-  distinct.forEach((r,i)=>{
-    const ctxK = r.ctx ? Math.round(r.ctx/1024)+"K" : "—";
-    const up = r.uptime ? r.uptime.u1d : null;
-    const pickerBadge = r.provider==="opencode" ? (r.picker==="picker" ? ` <span class="pill free" title="In /models picker (keyless IP-limited, higher quota with Zen login)">✅ picker</span>` : r.picker==="deprecated" ? ` <span class="pill" title="Deprecated — hidden from /models picker">⚠️ deprecated</span>` : "") : "";
-    const prov = r.provider==="opencode" ? `<span class="pill">OpenCode</span>${pickerBadge}` : `<span class="pill">${r.provider}</span>` + (r.uptime?` <span class="small">${r.uptime.provider}</span>`:"");
-    const link = r.aaSlug ? `<a href="https://artificialanalysis.ai/models/${r.aaSlug}" target="_blank">${r.id}</a>` : r.id;
-    html+=`<tr><td class="rank">${i+1}</td><td class="mono">${link}${r.aaSlug?`<div class="small">↳ ${r.aaSlug}</div>`:""}</td><td data-sort="${r.intel??-1}">${fmtIntel(r.intel)}</td><td data-sort="${r.code??-1}">${r.code!=null?Number(r.code).toFixed(1):"N/A"}</td><td data-sort="${r.ctx||0}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
+  let html='<table id="leftTable"><thead><tr><th>#</th><th>Model</th><th>AA Intel</th><th>Coding</th><th>Ctx</th><th>Uptime 1d</th><th>Free on</th></tr></thead><tbody>';
+  merged.forEach((g,i)=>{
+    const ctx = Math.max(...g.rows.map(r=>r.ctx||0));
+    const ctxK = ctx ? Math.round(ctx/1024)+"K" : "—";
+    const up = (g.rows.find(r=>r.uptime)||{}).uptime?.u1d ?? null;
+    const ids = g.rows.map(r=>r.id).join(" · ");
+    const prov = g.rows.map(r=>{
+      if(r.src==="opencode"){
+        const b = r.picker==="picker" ? ` <span class="pill free" title="In /models picker (keyless IP-limited, higher quota with Zen login)">✅ picker</span>` : "";
+        return `<span class="pill">OpenCode</span>${b}`;
+      }
+      const nt = r.noTools ? ` <span class="pill" title="OpenRouter does not list tool support for this model">no tools</span>` : "";
+      return `<span class="pill">OpenRouter</span>${nt}`;
+    }).join(" ");
+    html+=`<tr><td class="rank">${i+1}</td><td class="mono"><a href="https://artificialanalysis.ai/models/${g.aaSlug}" target="_blank">${g.aaSlug}</a><div class="small">${ids}</div></td><td data-sort="${g.intel}">${fmtIntel(g.intel)}</td><td data-sort="${g.code??-1}">${g.code!=null?Number(g.code).toFixed(1):"N/A"}</td><td data-sort="${ctx}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
   });
   html+='</tbody></table>';
   el('leftBody').innerHTML=html;
   makeSortable('leftTable');
 
-  const unbench = rows.filter(r=>r.intel==null).map(r=>r.id);
-  el('leftFoot').innerHTML = unbench.length ? `Unbenchmarked free (N/A): ${unbench.map(s=>`<code>${s}</code>`).join(" · ")}` : "";
+  el('leftFoot').innerHTML = unbench.length ? `No AA benchmark (N/A): ${unbench.map(r=>`<code>${r.id}</code>${r.src==="opencode"?" (OpenCode)":""}`).join(" · ")}` : "";
   const stAge = (pickerStatus && pickerStatus.updated_utc) ? ` · picker status ${pickerStatus.updated_utc}` : "";
-  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rows.length} free models evaluated${stAge}`;
+  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${merged.length} benchmarked free models (${rows.length} listings)${stAge}`;
 }
 
 function renderRight(aaList){
@@ -604,18 +589,17 @@ async function buildAll(force=false){
       fetchAA(force)
     ]);
     await fetchPickerStatus();
-    const {orFreeTools} = buildFreeUniverse(orData, opData);
+    const orFree = buildFreeUniverse(orData);
     const aaBySlug=new Map();
     for(const m of aaData){ if(m.slug) aaBySlug.set(m.slug, m); }
     log(`Loaded ${orData.length} OR models, ${opData.length} OpenCode, ${aaData.length} AA. Fetching uptime…`);
-    const uptimeIds = orFreeTools.map(m=>m.id).slice(0,22);
-    const uptimeMap = await fetchUptimeFor(uptimeIds);
-    renderLeft(orFreeTools, opData, aaBySlug, uptimeMap);
+    const uptimeMap = await fetchUptimeFor(orFree.map(m=>m.id));
+    renderLeft(orFree, opData, aaBySlug, uptimeMap);
     renderRight(aaData);
     {
       const nStatus = pickerStatus && pickerStatus.free ? Object.keys(pickerStatus.free).length : 0;
       const nActive = pickerStatus && pickerStatus.free ? Object.values(pickerStatus.free).filter(v=>v && v.active).length : 0;
-      log(`Done — ${orFreeTools.length} OR free+tools, ${opData.length} OpenCode, ${aaData.length} AA${nStatus?`, picker ${nActive}/${nStatus} active`:""}. Updated ${new Date().toLocaleTimeString()}.`);
+      log(`Done — ${orFree.length} OR free, ${opData.length} OpenCode, ${aaData.length} AA${nStatus?`, picker ${nActive}/${nStatus} active`:""}. Updated ${new Date().toLocaleTimeString()}.`);
     }
   }catch(e){
     showErr(String(e.message||e));
