@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-22T02:12Z",
+  "updated_utc": "2026-09-22T10:29Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -182,8 +182,8 @@
       }
     },
     "mimo-v2.5-free": {
-      "status": "active",
-      "active": true,
+      "status": "deprecated",
+      "active": false,
       "context": 200000,
       "cost": {
         "input": 0,
