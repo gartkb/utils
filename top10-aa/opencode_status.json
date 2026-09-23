@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-23T15:41Z",
+  "updated_utc": "2026-09-23T20:46Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
