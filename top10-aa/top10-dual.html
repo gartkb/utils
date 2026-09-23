@@ -50,6 +50,16 @@ canvas{width:100%;height:420px;background:#0b0d11;border:1px solid var(--border)
 #log{margin:0 16px 12px;padding:8px;border:1px dashed var(--border);border-radius:8px;font-size:11px;color:var(--muted);white-space:pre-wrap}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
+.link-btn{background:none;border:none;color:var(--accent);font-size:11px;padding:0;cursor:pointer;text-decoration:none}
+.link-btn:hover{text-decoration:underline}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:10px;max-width:900px;width:100%;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+.modal header{position:static;background:none;border-bottom:1px solid var(--border);padding:12px 14px;display:flex;gap:10px;align-items:center}
+.modal header h3{margin:0;font-size:13px}
+.modal header .x{margin-left:auto}
+.modal .modal-sub{padding:8px 14px;font-size:11px;color:var(--muted);border-bottom:1px solid var(--border)}
+.modal .modal-body{padding:10px 14px;overflow:auto}
 </style>
 </head>
 <body>
@@ -72,6 +82,7 @@ a:hover{text-decoration:underline}
     <div class="sub">Universe: OR free (<code>prompt==0 && completion==0</code>, tools shown as badge) + OpenCode free (picker status), merged by AA model. <span id="leftMeta" class="small"></span></div>
     <div id="leftBody">Loading…</div>
     <div id="leftFoot" class="small" style="margin-top:8px"></div>
+    <div class="small" style="margin-top:6px"><button id="unratedBtn" class="link-btn" style="display:none"></button></div>
   </div>
   <div class="card" id="rightCard">
     <h2>All Models — Value & Frontier</h2>
@@ -93,6 +104,16 @@ a:hover{text-decoration:underline}
     <div id="scatterTip" class="small" style="margin-top:6px;min-height:14px"></div>
   </div>
 </main>
+<div id="unratedOverlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="unratedTitle">
+  <div class="modal">
+    <header>
+      <h3 id="unratedTitle">Unrated free models</h3>
+      <button class="x" id="unratedClose">Close ✕</button>
+    </header>
+    <div class="modal-sub" id="unratedSub"></div>
+    <div class="modal-body" id="unratedBody"></div>
+  </div>
+</div>
 <script>
 const LS_KEY="AA_API_KEY";
 const LS_CACHE="aa_or_cache_v4";
@@ -300,6 +321,7 @@ function findAAMatch(rawId, aaBySlug){
 }
 
 let currentLeft=[], currentRight=[], currentAA=[], currentFreeSet=new Set();
+let currentUnbench=[];
 let rightThresh=40, rightMode="value";
 let allAACandidates=[];
 
@@ -363,9 +385,11 @@ function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
   // One row per (provider, id). Tools flag is a badge, not a filter.
   const rows = orFree.map(m=>{
     const match = findAAMatch(m.id, aaBySlug);
+    const supp = m.supported_parameters||[];
     return {id:m.id, src:"or", ctx:m.context_length||0, provider:m.id.split("/")[0], aaSlug:match.slug,
       ...evalOf(match.model), uptime:uptimeMap[m.id]||null,
-      noTools: !(m.supported_parameters||[]).includes("tools")};
+      noTools: !supp.includes("tools"),
+      name: m.name||m.id, supported: supp};
   });
 
   // OpenCode free: picker status (cost==0 upstream) is truth; name filter is fallback for ids it doesn't know.
@@ -379,7 +403,8 @@ function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
     const match = findAAMatch(oid, aaBySlug);
     const ctx = om.context_length || om.context_window || (st && st.context) || ctxMap[oid] || 0;
     rows.push({id:oid, src:"opencode", ctx, provider:"opencode", aaSlug:match.slug, ...evalOf(match.model),
-      uptime:null, picker: st ? "picker" : "unknown"});
+      uptime:null, picker: st ? "picker" : "unknown", pickerDetail: st||null,
+      name: om.name||oid, limit: om.limit||null, raw: om});
   });
 
   // Merge by AA slug so a model free on several providers is one row listing all of them.
@@ -413,10 +438,74 @@ function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
   el('leftBody').innerHTML=html;
   makeSortable('leftTable');
 
-  el('leftFoot').innerHTML = unbench.length ? `No AA benchmark (N/A): ${unbench.map(r=>`<code>${r.id}</code>${r.src==="opencode"?" (OpenCode)":""}`).join(" · ")}` : "";
+  currentUnbench = [...unbench].sort((a,b)=> String(a.id).localeCompare(String(b.id)));
+
+  if(currentUnbench.length){
+    const preview = currentUnbench.slice(0,4).map(r=>`<code>${r.id}</code>`).join(" · ");
+    const more = currentUnbench.length>4 ? ` +${currentUnbench.length-4} more` : "";
+    el('leftFoot').innerHTML = `No AA benchmark (N/A): ${preview}${more}`;
+    const btn = el('unratedBtn');
+    btn.style.display = "";
+    btn.textContent = `Show all ${currentUnbench.length} unrated free models`;
+    btn.onclick = openUnratedModal;
+  } else {
+    el('leftFoot').innerHTML = "";
+    el('unratedBtn').style.display = "none";
+  }
   const stAge = (pickerStatus && pickerStatus.updated_utc) ? ` · picker status ${pickerStatus.updated_utc}` : "";
   el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${merged.length} benchmarked free models (${rows.length} listings)${stAge}`;
 }
+
+function escHtml(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function openUnratedModal(){
+  const overlay = el('unratedOverlay');
+  const n = currentUnbench.length;
+  el('unratedSub').textContent = n ? `${n} free listing${n===1?"":"s"} with no AA intelligence score — same universe as the left table (OR priced 0/0 + OpenCode picker free).` : "No unrated free models right now.";
+  if(!n){ el('unratedBody').innerHTML = '<div class="small">Nothing to show.</div>'; }
+  else {
+    let html = '<table><thead><tr><th>#</th><th>Model</th><th>Source</th><th>Ctx</th><th>Tools / picker</th><th>Uptime 1d</th><th>AA guess</th></tr></thead><tbody>';
+    currentUnbench.forEach((r,i)=>{
+      const ctxK = r.ctx ? Math.round(r.ctx/1024)+"K" : "—";
+      const ctxTitle = r.ctx ? `${r.ctx.toLocaleString()} tokens` : "unknown context";
+      let srcBadge, toolInfo;
+      if(r.src==="opencode"){
+        srcBadge = '<span class="pill">OpenCode</span>';
+        if(r.pickerDetail){
+          const d = r.pickerDetail;
+          const parts = [];
+          if(d.status) parts.push(`status: ${escHtml(d.status)}`);
+          parts.push(`active: ${d.active===false?"no":"yes"}`);
+          if(d.context) parts.push(`ctx ${(d.context/1024).toFixed(0)}K`);
+          toolInfo = `<span class="pill free" title="${escHtml(parts.join(" · "))}">✅ picker</span>`;
+        } else {
+          toolInfo = '<span class="pill" title="Matched by -free name only; not seen in picker status file">unknown</span>';
+        }
+      } else {
+        srcBadge = '<span class="pill">OpenRouter</span>';
+        toolInfo = r.noTools
+          ? '<span class="pill" title="OpenRouter does not list tool support">no tools</span>'
+          : '<span class="pill free" title="OpenRouter lists tool support">tools ✓</span>';
+      }
+      const up = r.uptime?.u1d ?? null;
+      const aaCell = r.aaSlug ? `<a href="https://artificialanalysis.ai/models/${escHtml(r.aaSlug)}" target="_blank" class="mono">${escHtml(r.aaSlug)}</a>` : "—";
+      const nameSub = (r.name && r.name!==r.id) ? `<div class="small">${escHtml(r.name)}</div>` : "";
+      const suppTitle = r.supported ? escHtml(r.supported.join(", ")||"none listed") : "";
+      html += `<tr><td class="rank">${i+1}</td>`
+        + `<td class="mono" title="${suppTitle}"><code>${escHtml(r.id)}</code>${nameSub}</td>`
+        + `<td>${srcBadge}<div class="small">${escHtml(r.provider||"")}</div></td>`
+        + `<td data-sort="${r.ctx||0}" title="${escHtml(ctxTitle)}">${ctxK}</td>`
+        + `<td>${toolInfo}</td>`
+        + `<td data-sort="${up??-1}">${uptimeBadge(up)}</td>`
+        + `<td class="mono small">${aaCell}</td></tr>`;
+    });
+    html += '</tbody></table><div class="small" style="margin-top:6px">Tip: “AA guess” is the auto-mapped Artificial Analysis slug (no score yet). Click to check if AA has since added it.</div>';
+    el('unratedBody').innerHTML = html;
+  }
+  overlay.classList.add('open');
+}
+
+function closeUnratedModal(){ el('unratedOverlay').classList.remove('open'); }
 
 function renderRight(aaList){
   const candidates = aaList
@@ -625,6 +714,9 @@ document.querySelectorAll('#modeToggle button').forEach(btn=>{
 });
 
 el('refreshBtn').onclick=()=> buildAll(true);
+el('unratedClose').onclick=closeUnratedModal;
+el('unratedOverlay').addEventListener('click', (e)=>{ if(e.target===el('unratedOverlay')) closeUnratedModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==="Escape") closeUnratedModal(); });
 window.addEventListener('resize', drawScatter);
 buildAll(false);
 </script>
