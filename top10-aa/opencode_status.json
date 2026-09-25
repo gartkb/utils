@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-09-25T02:14Z",
+  "updated_utc": "2026-09-25T10:43Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -34,8 +34,8 @@
       }
     },
     "muse-spark-1.2-contributor-free": {
-      "status": "active",
-      "active": true,
+      "status": "deprecated",
+      "active": false,
       "context": 1048576,
       "cost": {
         "input": 0,
