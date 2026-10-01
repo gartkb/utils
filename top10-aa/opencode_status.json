@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-01T11:58Z",
+  "updated_utc": "2026-10-01T17:59Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -11,6 +11,15 @@
         "input": 0,
         "output": 0,
         "cache_read": 0
+      }
+    },
+    "fledge-alpha-free": {
+      "status": "active",
+      "active": true,
+      "context": 1048576,
+      "cost": {
+        "input": 0,
+        "output": 0
       }
     },
     "qwen3.6-plus-free": {
