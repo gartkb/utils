@@ -1,11 +1,11 @@
 {
-  "updated_utc": "2026-10-14T10:46Z",
+  "updated_utc": "2026-10-14T16:05Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
     "ling-3.0-flash-fin-free": {
-      "status": "active",
-      "active": true,
+      "status": "deprecated",
+      "active": false,
       "context": 262144,
       "cost": {
         "input": 0,
@@ -53,8 +53,8 @@
       }
     },
     "ling-3.1-flash-free": {
-      "status": "active",
-      "active": true,
+      "status": "deprecated",
+      "active": false,
       "context": 262144,
       "cost": {
         "input": 0,
