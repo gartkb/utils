@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-16T10:16Z",
+  "updated_utc": "2026-10-16T15:41Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -160,8 +160,8 @@
       }
     },
     "cat-jam-free": {
-      "status": "active",
-      "active": true,
+      "status": "deprecated",
+      "active": false,
       "context": 1048576,
       "cost": {
         "input": 0,
@@ -353,6 +353,16 @@
       "status": "active",
       "active": true,
       "context": 200000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "beam-free": {
+      "status": "active",
+      "active": true,
+      "context": 1048576,
       "cost": {
         "input": 0,
         "output": 0,
