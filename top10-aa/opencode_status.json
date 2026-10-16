@@ -1,5 +1,5 @@
 {
-  "updated_utc": "2026-10-16T02:00Z",
+  "updated_utc": "2026-10-16T10:16Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
@@ -209,6 +209,16 @@
         "cache_write": 0
       }
     },
+    "ll-alpha-free": {
+      "status": "active",
+      "active": true,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
     "nemotron-3-super-free": {
       "status": "deprecated",
       "active": false,
@@ -277,6 +287,16 @@
       "cost": {
         "input": 0,
         "output": 0
+      }
+    },
+    "glm-5.3-flash-free": {
+      "status": "active",
+      "active": true,
+      "context": 200000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
       }
     },
     "deepseek-v4-flash-free": {
