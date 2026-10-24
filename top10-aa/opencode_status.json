@@ -1,9 +1,9 @@
 {
-  "updated_utc": "2026-10-24T02:17Z",
+  "updated_utc": "2026-10-24T09:56Z",
   "source": "https://models.dev/api.json (opencode provider)",
   "note": "active = shown in opencode /models picker (keyless IP-limited, higher quota with Zen login). Free detected by cost==0, suffix fallback.",
   "free": {
-    "ll-alpha-free": {
+    "ling-3.0-flash-fin-free": {
       "status": "deprecated",
       "active": false,
       "context": 262144,
@@ -13,9 +13,9 @@
         "cache_read": 0
       }
     },
-    "deepseek-v4-flash-free": {
-      "status": "deprecated",
-      "active": false,
+    "glm-5.3-flash-free": {
+      "status": "active",
+      "active": true,
       "context": 200000,
       "cost": {
         "input": 0,
@@ -23,13 +23,65 @@
         "cache_read": 0
       }
     },
-    "exo-free": {
+    "muse-spark-1.3-contributor-free": {
       "status": "deprecated",
       "active": false,
       "context": 1048576,
       "cost": {
         "input": 0,
-        "output": 0
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "nemotron-3-ultra-free": {
+      "status": "active",
+      "active": true,
+      "context": 1000000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "longcat-2.0-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1000000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "minimax-m3.1-flash-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1000000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "grok-code": {
+      "status": "deprecated",
+      "active": false,
+      "context": 256000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0,
+        "cache_write": 0
+      }
+    },
+    "mimo-v2.5-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 200000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
       }
     },
     "ling-2.6-flash-free": {
@@ -41,7 +93,126 @@
         "output": 0
       }
     },
-    "ling-3.0-flash-free": {
+    "step-5-preview-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1000000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "flint-40b-free": {
+      "status": "active",
+      "active": true,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "hy3-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 190000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "hy3-preview-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 256000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "nemotron-3.5-lightning-free": {
+      "status": "active",
+      "active": true,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "muse-spark-1.2-contributor-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1048576,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "minimax-m2.1-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 204800,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "minimax-m3-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 200000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "ring-2.6-1t-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 262000,
+      "cost": {
+        "input": 0,
+        "output": 0
+      }
+    },
+    "glm-5-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 204800,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "mimo-v2.6-flash-free": {
+      "status": "active",
+      "active": true,
+      "context": 200000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "mimo-v2-pro-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1048576,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "mimo-v2-flash-free": {
       "status": "deprecated",
       "active": false,
       "context": 262144,
@@ -62,29 +233,10 @@
         "cache_write": 0
       }
     },
-    "x-preview-f-free": {
+    "deepseek-v4-flash-free": {
       "status": "deprecated",
       "active": false,
-      "context": 1000000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "trinity-large-preview-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 131072,
-      "cost": {
-        "input": 0,
-        "output": 0
-      }
-    },
-    "flint-40b-free": {
-      "status": "active",
-      "active": true,
-      "context": 262144,
+      "context": 200000,
       "cost": {
         "input": 0,
         "output": 0,
@@ -101,10 +253,49 @@
         "cache_read": 0
       }
     },
-    "cat-jam-free": {
+    "kimi-k2.5-free": {
       "status": "deprecated",
       "active": false,
-      "context": 1048576,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "north-mini-code-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 256000,
+      "cost": {
+        "input": 0,
+        "output": 0
+      }
+    },
+    "ling-3.0-flash-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "minimax-m2.5-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 204800,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "deepseek-v4.1-flash-free": {
+      "status": "active",
+      "active": true,
+      "context": 200000,
       "cost": {
         "input": 0,
         "output": 0,
@@ -122,7 +313,17 @@
         "cache_write": 0
       }
     },
-    "fledge-alpha-free": {
+    "longcat-2.5-preview-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1000000,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "exo-free": {
       "status": "deprecated",
       "active": false,
       "context": 1048576,
@@ -131,71 +332,10 @@
         "output": 0
       }
     },
-    "mimo-v2-omni-free": {
+    "cat-jam-free": {
       "status": "deprecated",
       "active": false,
-      "context": 262144,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "mimo-v2.6-flash-free": {
-      "status": "active",
-      "active": true,
-      "context": 200000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "grok-code": {
-      "status": "deprecated",
-      "active": false,
-      "context": 256000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0,
-        "cache_write": 0
-      }
-    },
-    "nemotron-3.5-lightning-free": {
-      "status": "active",
-      "active": true,
-      "context": 262144,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "glm-4.7-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 204800,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "kimi-k2.5-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 262144,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "step-5-preview-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1000000,
+      "context": 1048576,
       "cost": {
         "input": 0,
         "output": 0,
@@ -212,33 +352,22 @@
         "cache_read": 0
       }
     },
-    "north-mini-code-free": {
+    "ling-3.0-tiny-free": {
       "status": "deprecated",
       "active": false,
-      "context": 256000,
+      "context": 262144,
       "cost": {
         "input": 0,
         "output": 0
       }
     },
-    "nemotron-3-ultra-free": {
-      "status": "active",
-      "active": true,
-      "context": 1000000,
+    "fledge-alpha-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 1048576,
       "cost": {
         "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "glm-5.3-flash-free": {
-      "status": "active",
-      "active": true,
-      "context": 200000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
+        "output": 0
       }
     },
     "nemotron-3-super-free": {
@@ -251,80 +380,10 @@
         "cache_read": 0
       }
     },
-    "ling-3.1-flash-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 262144,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "mimo-v2.5-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 200000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "minimax-m3-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 200000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "muse-spark-1.3-contributor-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1048576,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "minimax-m2.5-free": {
+    "glm-4.7-free": {
       "status": "deprecated",
       "active": false,
       "context": 204800,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "laguna-s-2.1-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 256000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "mimo-v2-flash-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 262144,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "mimo-v2-pro-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1048576,
       "cost": {
         "input": 0,
         "output": 0,
@@ -341,27 +400,17 @@
         "cache_read": 0
       }
     },
-    "minimax-m2.1-free": {
+    "x-preview-f-free": {
       "status": "deprecated",
       "active": false,
-      "context": 204800,
+      "context": 1000000,
       "cost": {
         "input": 0,
         "output": 0,
         "cache_read": 0
       }
     },
-    "ling-3.0-flash-fin-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 262144,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "hy3-preview-free": {
+    "laguna-s-2.1-free": {
       "status": "deprecated",
       "active": false,
       "context": 256000,
@@ -371,89 +420,40 @@
         "cache_read": 0
       }
     },
-    "longcat-2.5-preview-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1000000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "glm-5-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 204800,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "minimax-m3.1-flash-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1000000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "ring-2.6-1t-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 262000,
-      "cost": {
-        "input": 0,
-        "output": 0
-      }
-    },
-    "hy3-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 190000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "muse-spark-1.2-contributor-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1048576,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "deepseek-v4.1-flash-free": {
-      "status": "active",
-      "active": true,
-      "context": 200000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "longcat-2.0-free": {
-      "status": "deprecated",
-      "active": false,
-      "context": 1000000,
-      "cost": {
-        "input": 0,
-        "output": 0,
-        "cache_read": 0
-      }
-    },
-    "ling-3.0-tiny-free": {
+    "ll-alpha-free": {
       "status": "deprecated",
       "active": false,
       "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "mimo-v2-omni-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "ling-3.1-flash-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 262144,
+      "cost": {
+        "input": 0,
+        "output": 0,
+        "cache_read": 0
+      }
+    },
+    "trinity-large-preview-free": {
+      "status": "deprecated",
+      "active": false,
+      "context": 131072,
       "cost": {
         "input": 0,
         "output": 0
