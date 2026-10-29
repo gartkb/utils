@@ -225,19 +225,68 @@ function pickerInfo(id){
   return (pickerStatus && pickerStatus.free && pickerStatus.free[id]) || null;
 }
 
+// V2 list endpoints. The legacy /api/v2/data/llms/models route returns 410 Gone after 2026-11-04.
+const AA_ENDPOINT_PRO="https://artificialanalysis.ai/api/v2/language/models";       // Pro+ shape: blended price + context window
+const AA_ENDPOINT_FREE="https://artificialanalysis.ai/api/v2/language/models/free"; // any key, public subset of fields
+
+async function fetchAAJSON(url, key){
+  const r=await fetch(url, {headers:{"x-api-key":key}});
+  if(r.status===403){ const e=new Error(url+" → 403 Forbidden"); e.status=403; throw e; }
+  if(!r.ok) throw new Error(url+" → "+r.status+" "+r.statusText);
+  return r.json();
+}
+
+// The new list endpoints are paginated (200/page). Collect every page instead of dropping models.
+async function fetchAAPages(url, key){
+  const out=[];
+  for(let page=1; page<=20; page++){
+    const j=await fetchAAJSON(url+"?page="+page, key);
+    out.push(...(j.data||[]));
+    if(!j.pagination || !j.pagination.has_more) break;
+  }
+  return out;
+}
+
+// Map the V2 record onto the fields this page renders, so legacy caches and
+// Action-generated aa_models.json files keep working unchanged.
+function normalizeAAModel(m){
+  const p=m.pricing||{};
+  let blended = p.price_1m_blended_3_to_1 ?? p.price_1m_blended;
+  if(blended==null && p.price_1m_input_tokens!=null && p.price_1m_output_tokens!=null){
+    blended = (3*p.price_1m_input_tokens + p.price_1m_output_tokens)/4; // same 3:1 blend AA reports
+  }
+  return {
+    ...m,
+    pricing: {...p, price_1m_blended_3_to_1: blended},
+    context_length: m.context_length ?? m.context_window_tokens ?? null,
+    provider: m.provider || m.model_creator?.name || (m.slug||"").split("-")[0]
+  };
+}
+
+async function fetchAAAll(key){
+  let raw;
+  try{
+    raw=await fetchAAPages(AA_ENDPOINT_PRO, key);
+  }catch(e){
+    if(e.status!==403) throw e; // 403 = key isn't Pro; retry on the Free-shape sibling
+    raw=await fetchAAPages(AA_ENDPOINT_FREE, key);
+  }
+  return raw.map(normalizeAAModel);
+}
+
 async function fetchAA(force=false){
   const cached=loadCache();
   if(!force && cached && cached.aa) return cached.aa;
   const local=await fetchLocalJSON("./aa_models.json");
   if(local && Array.isArray(local) && local.length>100){
+    const data=local.map(normalizeAAModel);
     const existing=loadCache()||{};
-    saveCache({aa:local, or: existing.or || null});
-    return local;
+    saveCache({aa:data, or: existing.or || null});
+    return data;
   }
   const key=getAAKey();
   if(!key) throw new Error("AA_API_KEY missing and no ./aa_models.json found — please run the GitHub Action or paste your key above.");
-  const j=await fetchJSON("https://artificialanalysis.ai/api/v2/data/llms/models", {headers:{"X-API-Key":key}});
-  const data=j.data||j;
+  const data=await fetchAAAll(key);
   const existing=loadCache()||{};
   saveCache({aa:data, or: existing.or || null});
   return data;
