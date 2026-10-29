@@ -116,7 +116,7 @@ a:hover{text-decoration:underline}
 </div>
 <script>
 const LS_KEY="AA_API_KEY";
-const LS_CACHE="aa_or_cache_v4";
+const LS_CACHE="aa_or_cache_v5";
 const CACHE_TTL_MS=6*60*60*1000;
 const TOKENS_PER_TASK=10000;
 
@@ -276,7 +276,8 @@ async function fetchAAAll(key){
 
 async function fetchAA(force=false){
   const cached=loadCache();
-  if(!force && cached && cached.aa) return cached.aa;
+  // Cached entries can predate the V2 schema (or be written by an older build), so normalize on read.
+  if(!force && cached && Array.isArray(cached.aa) && cached.aa.length) return cached.aa.map(normalizeAAModel);
   const local=await fetchLocalJSON("./aa_models.json");
   if(local && Array.isArray(local) && local.length>100){
     const data=local.map(normalizeAAModel);
