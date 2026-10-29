@@ -341,7 +341,28 @@ const FREE_AA_MAP={
 };
 
 // Fuzzy matcher that maps OpenRouter / OpenCode IDs to Artificial Analysis slugs automatically
+// AA sometimes re-issues a model under a dated slug (e.g. deepseek-v4-1-flash-1017)
+// and leaves the undated slug deprecated and unscored. When the direct match has no
+// score, fall forward to the newest dated sibling that does (the score belongs to it).
+function findScoredDatedSibling(slug, aaBySlug){
+  if(!slug) return null;
+  const re = new RegExp("^"+slug.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"-\\d{3,4}$");
+  let best=null;
+  for(const [aaSlug, model] of aaBySlug.entries()){
+    if(!re.test(aaSlug)) continue;
+    if(model?.evaluations?.artificial_analysis_intelligence_index == null) continue;
+    if(!best || String(model.release_date||"") > String(best.model.release_date||"")) best={slug:aaSlug, model};
+  }
+  return best;
+}
+
 function findAAMatch(rawId, aaBySlug){
+  const hit = resolveAAMatch(rawId, aaBySlug);
+  if(hit.model?.evaluations?.artificial_analysis_intelligence_index != null) return hit;
+  return findScoredDatedSibling(hit.slug, aaBySlug) || hit;
+}
+
+function resolveAAMatch(rawId, aaBySlug){
   if(!rawId) return {slug:null, model:null};
   if(FREE_AA_MAP[rawId]){
     const s=FREE_AA_MAP[rawId];
