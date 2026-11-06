@@ -1,4 +1,4 @@
-name: Update AA data every 6 hrs
+name: Update AA data every 3 hrs
 
 on:
   schedule:
