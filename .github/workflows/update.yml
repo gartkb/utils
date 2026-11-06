@@ -2,7 +2,7 @@ name: Update AA data every 3 hrs
 
 on:
   schedule:
-    - cron: "17 */3 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -37,6 +37,7 @@ jobs:
                   "User-Agent": UA,
               })
               with urllib.request.urlopen(req, timeout=60) as r:
+                  print("AA quota remaining:", r.headers.get("X-RateLimit-Remaining"))
                   return json.loads(r.read())
 
           def fetch_all(base):
