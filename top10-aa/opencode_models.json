@@ -4,7 +4,7 @@
     {
       "id": "big-pickle",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Big Pickle",
       "type": "chat",
@@ -74,7 +74,7 @@
     {
       "id": "mimo-v2.6-flash-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "MiMo-V2.6-Flash Free",
       "canonical_id": "xiaomi/mimo-v2.6-flash",
@@ -161,7 +161,7 @@
     {
       "id": "deepseek-v4.1-flash-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "DeepSeek V4.1 Flash Free",
       "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
@@ -248,7 +248,7 @@
     {
       "id": "glm-5.3-flash-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GLM-5.3-Flash Free",
       "canonical_id": "zhipuai/glm-5.3-flash",
@@ -331,7 +331,7 @@
     {
       "id": "claude-fable-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Fable 5",
       "canonical_id": "anthropic/claude-fable-5",
@@ -438,7 +438,7 @@
     {
       "id": "claude-fable-5-1",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Fable 5.1",
       "canonical_id": "anthropic/claude-fable-5-1",
@@ -543,7 +543,7 @@
     {
       "id": "claude-haiku-4-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Haiku 4.5",
       "canonical_id": "anthropic/claude-haiku-4-5",
@@ -642,7 +642,7 @@
     {
       "id": "claude-haiku-5-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Haiku 5.5",
       "canonical_id": "anthropic/claude-haiku-5-5",
@@ -775,7 +775,7 @@
     {
       "id": "claude-opus-4-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Opus 4.5",
       "canonical_id": "anthropic/claude-opus-4-5",
@@ -879,7 +879,7 @@
     {
       "id": "claude-opus-4-6",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Opus 4.6",
       "canonical_id": "anthropic/claude-opus-4-6",
@@ -984,7 +984,7 @@
     {
       "id": "claude-opus-4-7",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Opus 4.7",
       "canonical_id": "anthropic/claude-opus-4-7",
@@ -1087,7 +1087,7 @@
     {
       "id": "claude-opus-4-8",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Opus 4.8",
       "canonical_id": "anthropic/claude-opus-4-8",
@@ -1194,7 +1194,7 @@
     {
       "id": "claude-opus-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Opus 5",
       "canonical_id": "anthropic/claude-opus-5",
@@ -1301,7 +1301,7 @@
     {
       "id": "claude-opus-5-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Opus 5.5",
       "canonical_id": "anthropic/claude-opus-5-5",
@@ -1406,7 +1406,7 @@
     {
       "id": "claude-sonnet-4-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Sonnet 4.5",
       "canonical_id": "anthropic/claude-sonnet-4-5",
@@ -1529,7 +1529,7 @@
     {
       "id": "claude-sonnet-4-6",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Sonnet 4.6",
       "canonical_id": "anthropic/claude-sonnet-4-6",
@@ -1634,7 +1634,7 @@
     {
       "id": "claude-sonnet-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Sonnet 5",
       "canonical_id": "anthropic/claude-sonnet-5",
@@ -1737,7 +1737,7 @@
     {
       "id": "claude-sonnet-5-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Sonnet 5.5",
       "canonical_id": "anthropic/claude-sonnet-5-5",
@@ -1842,7 +1842,7 @@
     {
       "id": "deepseek-v4.1-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "DeepSeek V4.1 Flash 1017",
       "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
@@ -1932,7 +1932,7 @@
     {
       "id": "deepseek-v4-pro",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "DeepSeek V4 Pro",
       "canonical_id": "deepseek/deepseek-v4-pro",
@@ -2017,7 +2017,7 @@
     {
       "id": "gemini-3.5-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 3.5 Flash",
       "canonical_id": "google/gemini-3.5-flash",
@@ -2130,7 +2130,7 @@
     {
       "id": "gemini-3.5-flash-lite",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 3.5 Flash Lite",
       "canonical_id": "google/gemini-3.5-flash-lite",
@@ -2241,7 +2241,7 @@
     {
       "id": "gemini-3.6-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 3.6 Flash",
       "canonical_id": "google/gemini-3.6-flash",
@@ -2364,7 +2364,7 @@
     {
       "id": "gemini-3.7-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 3.7 Flash",
       "canonical_id": "google/gemini-3.7-flash",
@@ -2486,7 +2486,7 @@
     {
       "id": "gemini-3.8-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 3.8 Flash",
       "canonical_id": "google/gemini-3.8-flash",
@@ -2610,7 +2610,7 @@
     {
       "id": "gemini-4-argon",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 4 Argon",
       "canonical_id": "google/gemini-4-argon",
@@ -2735,7 +2735,7 @@
     {
       "id": "glm-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GLM-5",
       "canonical_id": "zhipuai/glm-5",
@@ -2812,7 +2812,7 @@
     {
       "id": "glm-5.1",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GLM-5.1",
       "canonical_id": "zhipuai/glm-5.1",
@@ -2886,7 +2886,7 @@
     {
       "id": "glm-5.2",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GLM-5.2",
       "canonical_id": "zhipuai/glm-5.2",
@@ -2963,7 +2963,7 @@
     {
       "id": "glm-5.3",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GLM-5.3",
       "canonical_id": "zhipuai/glm-5.3",
@@ -3044,7 +3044,7 @@
     {
       "id": "glm-5.3-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GLM-5.3-Flash",
       "canonical_id": "zhipuai/glm-5.3-flash",
@@ -3130,7 +3130,7 @@
     {
       "id": "gpt-5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5",
       "canonical_id": "openai/gpt-5",
@@ -3221,7 +3221,7 @@
     {
       "id": "gpt-5-codex",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5 Codex",
       "canonical_id": "openai/gpt-5-codex",
@@ -3311,7 +3311,7 @@
     {
       "id": "gpt-5-nano",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5 Nano",
       "canonical_id": "openai/gpt-5-nano",
@@ -3405,7 +3405,7 @@
     {
       "id": "gpt-5.1",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.1",
       "canonical_id": "openai/gpt-5.1",
@@ -3496,7 +3496,7 @@
     {
       "id": "gpt-5.1-codex",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex",
       "canonical_id": "openai/gpt-5.1-codex",
@@ -3586,7 +3586,7 @@
     {
       "id": "gpt-5.1-codex-max",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex Max",
       "canonical_id": "openai/gpt-5.1-codex-max",
@@ -3677,7 +3677,7 @@
     {
       "id": "gpt-5.1-codex-mini",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex Mini",
       "canonical_id": "openai/gpt-5.1-codex-mini",
@@ -3767,7 +3767,7 @@
     {
       "id": "gpt-5.2",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.2",
       "canonical_id": "openai/gpt-5.2",
@@ -3859,7 +3859,7 @@
     {
       "id": "gpt-5.2-codex",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.2 Codex",
       "canonical_id": "openai/gpt-5.2-codex",
@@ -3951,7 +3951,7 @@
     {
       "id": "gpt-5.3-codex",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.3 Codex",
       "canonical_id": "openai/gpt-5.3-codex",
@@ -4044,7 +4044,7 @@
     {
       "id": "gpt-5.3-codex-spark",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.3 Codex Spark",
       "canonical_id": "openai/gpt-5.3-codex-spark",
@@ -4119,7 +4119,7 @@
     {
       "id": "gpt-5.4",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.4",
       "canonical_id": "openai/gpt-5.4",
@@ -4236,7 +4236,7 @@
     {
       "id": "gpt-5.4-mini",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.4 Mini",
       "canonical_id": "openai/gpt-5.4-mini",
@@ -4330,7 +4330,7 @@
     {
       "id": "gpt-5.4-nano",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.4 Nano",
       "canonical_id": "openai/gpt-5.4-nano",
@@ -4423,7 +4423,7 @@
     {
       "id": "gpt-5.4-pro",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.4 Pro",
       "canonical_id": "openai/gpt-5.4-pro",
@@ -4515,7 +4515,7 @@
     {
       "id": "gpt-5.5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.5",
       "canonical_id": "openai/gpt-5.5",
@@ -4632,7 +4632,7 @@
     {
       "id": "gpt-5.5-pro",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.5 Pro",
       "canonical_id": "openai/gpt-5.5-pro",
@@ -4724,7 +4724,7 @@
     {
       "id": "gpt-5.6-luna",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.6 Luna",
       "canonical_id": "openai/gpt-5.6-luna",
@@ -4857,7 +4857,7 @@
     {
       "id": "gpt-5.6-sol",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.6 Sol",
       "canonical_id": "openai/gpt-5.6-sol",
@@ -4990,7 +4990,7 @@
     {
       "id": "gpt-6-astra",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-6 Astra",
       "canonical_id": "openai/gpt-6-astra",
@@ -5122,7 +5122,7 @@
     {
       "id": "gpt-6-sol",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-6 Sol",
       "canonical_id": "openai/gpt-6-sol",
@@ -5255,7 +5255,7 @@
     {
       "id": "gpt-6.1-sol",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-6.1 Sol",
       "canonical_id": "openai/gpt-6.1-sol",
@@ -5387,7 +5387,7 @@
     {
       "id": "gpt-6-luna",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-6 Luna",
       "canonical_id": "openai/gpt-6-luna",
@@ -5520,7 +5520,7 @@
     {
       "id": "gpt-5.6-terra",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "GPT-5.6 Terra",
       "canonical_id": "openai/gpt-5.6-terra",
@@ -5653,7 +5653,7 @@
     {
       "id": "grok-4.5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Grok 4.5",
       "canonical_id": "xai/grok-4.5",
@@ -5756,7 +5756,7 @@
     {
       "id": "grok-4.6",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Grok 4.6",
       "canonical_id": "xai/grok-4.6",
@@ -5861,7 +5861,7 @@
     {
       "id": "grok-4.7",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Grok 4.7",
       "canonical_id": "xai/grok-4.7",
@@ -5970,7 +5970,7 @@
     {
       "id": "grok-build-0.1",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Grok Build 0.1",
       "canonical_id": "xai/grok-build-0.1",
@@ -6046,7 +6046,7 @@
     {
       "id": "kimi-k2.5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Kimi K2.5",
       "canonical_id": "moonshotai/kimi-k2.5",
@@ -6133,7 +6133,7 @@
     {
       "id": "kimi-k2.6",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Kimi K2.6",
       "canonical_id": "moonshotai/kimi-k2.6",
@@ -6225,7 +6225,7 @@
     {
       "id": "kimi-k2.7-code",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Kimi K2.7 Code",
       "canonical_id": "moonshotai/kimi-k2.7-code",
@@ -6317,7 +6317,7 @@
     {
       "id": "kimi-k3",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Kimi K3",
       "canonical_id": "moonshotai/kimi-k3",
@@ -6421,7 +6421,7 @@
     {
       "id": "minimax-m2.5",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "MiniMax-M2.5",
       "canonical_id": "minimax/MiniMax-M2.5",
@@ -6491,7 +6491,7 @@
     {
       "id": "minimax-m2.7",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "MiniMax-M2.7",
       "canonical_id": "minimax/MiniMax-M2.7",
@@ -6561,7 +6561,7 @@
     {
       "id": "minimax-m3",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "MiniMax-M3",
       "canonical_id": "minimax/MiniMax-M3",
@@ -6645,7 +6645,7 @@
     {
       "id": "muse-spark-1.2",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Muse Spark 1.2",
       "canonical_id": "meta/muse-spark-1.2",
@@ -6727,7 +6727,7 @@
     {
       "id": "muse-spark-1.3",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Muse Spark 1.3",
       "canonical_id": "meta/muse-spark-1.3",
@@ -6812,7 +6812,7 @@
     {
       "id": "muse-wonder-1.0",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Muse Wonder",
       "canonical_id": "meta/muse-wonder-1.0",
@@ -6898,7 +6898,7 @@
     {
       "id": "mistral-large-4",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Mistral Large 4",
       "canonical_id": "mistral/mistral-large-4",
@@ -6983,7 +6983,7 @@
     {
       "id": "qwen3.5-plus",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Qwen3.5 Plus",
       "canonical_id": "alibaba/qwen3.5-plus",
@@ -7070,7 +7070,7 @@
     {
       "id": "qwen3.6-plus",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Qwen3.6 Plus",
       "canonical_id": "alibaba/qwen3.6-plus",
@@ -7164,7 +7164,7 @@
     {
       "id": "qwen3.8-flash",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Qwen3.8 Flash",
       "canonical_id": "alibaba/qwen3.8-flash",
@@ -7264,7 +7264,7 @@
     {
       "id": "qwen3.8-max",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Qwen3.8 Max",
       "canonical_id": "alibaba/qwen3.8-max",
@@ -7354,7 +7354,7 @@
     {
       "id": "longcat-2.5-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "LongCat 2.5 Free",
       "canonical_id": "meituan/longcat-2.5",
@@ -7425,7 +7425,7 @@
     {
       "id": "iceman-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Iceman Free",
       "type": "chat",
@@ -7486,7 +7486,7 @@
     {
       "id": "inkling-2-small-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Inkling 2 Small Free",
       "canonical_id": "thinkingmachines/inkling-2-small",
@@ -7565,7 +7565,7 @@
     {
       "id": "beam-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Beam Free",
       "canonical_id": "reflection/beam-1.0-501b-a23b",
@@ -7650,7 +7650,7 @@
     {
       "id": "flint-40b-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Flint 40B Free",
       "canonical_id": "recursive/flint",
@@ -7728,7 +7728,7 @@
     {
       "id": "nemotron-3.5-super-vl-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Nemotron 3.5 Super VL Free",
       "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
@@ -7808,7 +7808,7 @@
     {
       "id": "nemotron-3.5-lightning-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Nemotron 3.5 Lightning Free",
       "canonical_id": "nvidia/nemotron-3.5-lightning",
@@ -7879,7 +7879,7 @@
     {
       "id": "muse-ember-1.0",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Muse Ember 1.0",
       "canonical_id": "meta/muse-ember-1.0",
@@ -7985,7 +7985,7 @@
     {
       "id": "claude-fable-5-2",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Claude Fable 5.2",
       "canonical_id": "anthropic/claude-fable-5-2",
@@ -8090,7 +8090,7 @@
     {
       "id": "gemini-4-carbon",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 4 Carbon",
       "canonical_id": "google/gemini-4-carbon",
@@ -8215,7 +8215,7 @@
     {
       "id": "gemini-4-hydrogen",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Gemini 4 Hydrogen",
       "canonical_id": "google/gemini-4-hydrogen",
@@ -8335,7 +8335,7 @@
     {
       "id": "hy4-flash-free",
       "object": "model",
-      "created": 1794902164,
+      "created": 1794948973,
       "owned_by": "opencode",
       "name": "Hy4 flash Free",
       "canonical_id": "tencent/hy4-flash",
@@ -8402,6 +8402,270 @@
           "capabilities": {
             "tools": {
               "updates": []
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "gpt-6.2-sol",
+      "object": "model",
+      "created": 1794948973,
+      "owned_by": "opencode",
+      "name": "GPT-6.2 Sol",
+      "canonical_id": "openai/gpt-6.2-sol",
+      "type": "chat",
+      "description": "An efficient reasoning model for everyday work, multistep agentic workflows, and coding.",
+      "family": "gpt-sol",
+      "open_weights": false,
+      "knowledge": "2026-06-01",
+      "release_date": "2026-11-17",
+      "last_updated": "2026-11-17",
+      "modalities": {
+        "input": [
+          "text",
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+          "application/pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        },
+        "reasoning": {
+          "supported": true,
+          "effort": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "cache": {
+          "implicit": true
+        },
+        "structured_output": true,
+        "temperature": false,
+        "top_p": false,
+        "top_k": false,
+        "system_updates": true,
+        "effort_updates": true
+      },
+      "limit": {
+        "context": 1050000,
+        "input": 922000,
+        "output": 128000
+      },
+      "cost": {
+        "text": {
+          "input": {
+            "price": 2,
+            "cache": {
+              "read": 0.1,
+              "write": {
+                "30m": 2.5,
+                "12h": 5
+              }
+            },
+            "overrides": [
+              {
+                "when": {
+                  "context": {
+                    "gt": 272000
+                  }
+                },
+                "price": 4,
+                "cache": {
+                  "read": 0.2,
+                  "write": {
+                    "30m": 5,
+                    "12h": 10
+                  }
+                }
+              }
+            ]
+          },
+          "output": {
+            "price": 10,
+            "overrides": [
+              {
+                "when": {
+                  "context": {
+                    "gt": 272000
+                  }
+                },
+                "price": 15
+              }
+            ]
+          }
+        }
+      },
+      "api": {
+        "responses": {
+          "base_url": "https://opencode.ai/inference/openai/v1",
+          "sdk": {
+            "aisdk": "@ai-sdk/openai",
+            "opencodeai": "@opencode/ai/providers/openai/responses"
+          },
+          "capabilities": {
+            "tools": {
+              "strict": true,
+              "choice": [
+                "auto",
+                "none",
+                "required",
+                "tool"
+              ],
+              "search": true,
+              "freeform": [
+                "text",
+                "lark",
+                "regex"
+              ],
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "gpt-6.2-astra",
+      "object": "model",
+      "created": 1794948973,
+      "owned_by": "opencode",
+      "name": "GPT-6.2 Astra",
+      "canonical_id": "openai/gpt-6.2-astra",
+      "type": "chat",
+      "description": "A frontier reasoning model for coding, computer use, and professional work such as slides, spreadsheets, and documents.",
+      "family": "gpt-astra",
+      "open_weights": false,
+      "knowledge": "2026-05-18",
+      "release_date": "2026-11-17",
+      "last_updated": "2026-11-17",
+      "modalities": {
+        "input": [
+          "text",
+          "image/jpeg",
+          "image/png",
+          "image/gif",
+          "image/webp",
+          "application/pdf"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "capabilities": {
+        "tools": {
+          "supported": true
+        },
+        "reasoning": {
+          "supported": true,
+          "effort": [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max"
+          ]
+        },
+        "cache": {
+          "implicit": true
+        },
+        "structured_output": true,
+        "temperature": false,
+        "top_p": false,
+        "top_k": false,
+        "system_updates": true,
+        "effort_updates": true
+      },
+      "limit": {
+        "context": 1050000,
+        "input": 922000,
+        "output": 128000
+      },
+      "cost": {
+        "text": {
+          "input": {
+            "price": 8,
+            "cache": {
+              "read": 0.4,
+              "write": {
+                "30m": 10,
+                "12h": 20
+              }
+            },
+            "overrides": [
+              {
+                "when": {
+                  "context": {
+                    "gt": 272000
+                  }
+                },
+                "price": 16,
+                "cache": {
+                  "read": 0.8,
+                  "write": {
+                    "30m": 20,
+                    "12h": 40
+                  }
+                }
+              }
+            ]
+          },
+          "output": {
+            "price": 40,
+            "overrides": [
+              {
+                "when": {
+                  "context": {
+                    "gt": 272000
+                  }
+                },
+                "price": 60
+              }
+            ]
+          }
+        }
+      },
+      "api": {
+        "responses": {
+          "base_url": "https://opencode.ai/inference/openai/v1",
+          "sdk": {
+            "aisdk": "@ai-sdk/openai",
+            "opencodeai": "@opencode/ai/providers/openai/responses"
+          },
+          "capabilities": {
+            "tools": {
+              "strict": true,
+              "choice": [
+                "auto",
+                "none",
+                "required",
+                "tool"
+              ],
+              "search": true,
+              "freeform": [
+                "text",
+                "lark",
+                "regex"
+              ],
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
