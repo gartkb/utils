@@ -4,7 +4,7 @@
     {
       "id": "big-pickle",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Big Pickle",
       "type": "chat",
@@ -65,7 +65,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -74,7 +74,7 @@
     {
       "id": "mimo-v2.6-flash-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "MiMo-V2.6-Flash Free",
       "canonical_id": "xiaomi/mimo-v2.6-flash",
@@ -152,7 +152,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -161,7 +161,7 @@
     {
       "id": "deepseek-v4.1-flash-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "DeepSeek V4.1 Flash Free",
       "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
@@ -239,7 +239,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -248,7 +248,7 @@
     {
       "id": "glm-5.3-flash-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GLM-5.3-Flash Free",
       "canonical_id": "zhipuai/glm-5.3-flash",
@@ -322,7 +322,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -331,7 +331,7 @@
     {
       "id": "claude-fable-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Fable 5",
       "canonical_id": "anthropic/claude-fable-5",
@@ -425,7 +425,11 @@
                 "tool"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -434,7 +438,7 @@
     {
       "id": "claude-fable-5-1",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Fable 5.1",
       "canonical_id": "anthropic/claude-fable-5-1",
@@ -526,7 +530,11 @@
                 "none"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -535,7 +543,7 @@
     {
       "id": "claude-haiku-4-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Haiku 4.5",
       "canonical_id": "anthropic/claude-haiku-4-5",
@@ -625,7 +633,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -634,7 +642,7 @@
     {
       "id": "claude-haiku-5-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Haiku 5.5",
       "canonical_id": "anthropic/claude-haiku-5-5",
@@ -754,7 +762,11 @@
                 "tool"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -763,7 +775,7 @@
     {
       "id": "claude-opus-4-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Opus 4.5",
       "canonical_id": "anthropic/claude-opus-4-5",
@@ -858,7 +870,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -867,7 +879,7 @@
     {
       "id": "claude-opus-4-6",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Opus 4.6",
       "canonical_id": "anthropic/claude-opus-4-6",
@@ -963,7 +975,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -972,7 +984,7 @@
     {
       "id": "claude-opus-4-7",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Opus 4.7",
       "canonical_id": "anthropic/claude-opus-4-7",
@@ -1066,7 +1078,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -1075,7 +1087,7 @@
     {
       "id": "claude-opus-4-8",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Opus 4.8",
       "canonical_id": "anthropic/claude-opus-4-8",
@@ -1169,7 +1181,11 @@
                 "tool"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -1178,7 +1194,7 @@
     {
       "id": "claude-opus-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Opus 5",
       "canonical_id": "anthropic/claude-opus-5",
@@ -1272,7 +1288,11 @@
                 "tool"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -1281,7 +1301,7 @@
     {
       "id": "claude-opus-5-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Opus 5.5",
       "canonical_id": "anthropic/claude-opus-5-5",
@@ -1373,7 +1393,11 @@
                 "none"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -1382,7 +1406,7 @@
     {
       "id": "claude-sonnet-4-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Sonnet 4.5",
       "canonical_id": "anthropic/claude-sonnet-4-5",
@@ -1496,7 +1520,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -1505,7 +1529,7 @@
     {
       "id": "claude-sonnet-4-6",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Sonnet 4.6",
       "canonical_id": "anthropic/claude-sonnet-4-6",
@@ -1601,7 +1625,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -1610,7 +1634,7 @@
     {
       "id": "claude-sonnet-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Sonnet 5",
       "canonical_id": "anthropic/claude-sonnet-5",
@@ -1704,7 +1728,7 @@
                 "tool"
               ],
               "search": true,
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -1713,7 +1737,7 @@
     {
       "id": "claude-sonnet-5-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Sonnet 5.5",
       "canonical_id": "anthropic/claude-sonnet-5-5",
@@ -1805,7 +1829,11 @@
                 "none"
               ],
               "search": true,
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -1814,7 +1842,7 @@
     {
       "id": "deepseek-v4.1-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "DeepSeek V4.1 Flash 1017",
       "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
@@ -1895,7 +1923,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -1904,7 +1932,7 @@
     {
       "id": "deepseek-v4-pro",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "DeepSeek V4 Pro",
       "canonical_id": "deepseek/deepseek-v4-pro",
@@ -1980,7 +2008,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -1989,7 +2017,7 @@
     {
       "id": "gemini-3.5-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 3.5 Flash",
       "canonical_id": "google/gemini-3.5-flash",
@@ -2093,7 +2121,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2102,7 +2130,7 @@
     {
       "id": "gemini-3.5-flash-lite",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 3.5 Flash Lite",
       "canonical_id": "google/gemini-3.5-flash-lite",
@@ -2204,7 +2232,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2213,7 +2241,7 @@
     {
       "id": "gemini-3.6-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 3.6 Flash",
       "canonical_id": "google/gemini-3.6-flash",
@@ -2327,7 +2355,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2336,7 +2364,7 @@
     {
       "id": "gemini-3.7-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 3.7 Flash",
       "canonical_id": "google/gemini-3.7-flash",
@@ -2449,7 +2477,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2458,7 +2486,7 @@
     {
       "id": "gemini-3.8-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 3.8 Flash",
       "canonical_id": "google/gemini-3.8-flash",
@@ -2573,7 +2601,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2582,7 +2610,7 @@
     {
       "id": "gemini-4-argon",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 4 Argon",
       "canonical_id": "google/gemini-4-argon",
@@ -2698,7 +2726,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2707,7 +2735,7 @@
     {
       "id": "glm-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GLM-5",
       "canonical_id": "zhipuai/glm-5",
@@ -2775,7 +2803,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2784,7 +2812,7 @@
     {
       "id": "glm-5.1",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GLM-5.1",
       "canonical_id": "zhipuai/glm-5.1",
@@ -2849,7 +2877,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2858,7 +2886,7 @@
     {
       "id": "glm-5.2",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GLM-5.2",
       "canonical_id": "zhipuai/glm-5.2",
@@ -2926,7 +2954,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -2935,7 +2963,7 @@
     {
       "id": "glm-5.3",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GLM-5.3",
       "canonical_id": "zhipuai/glm-5.3",
@@ -3007,7 +3035,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3016,7 +3044,7 @@
     {
       "id": "glm-5.3-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GLM-5.3-Flash",
       "canonical_id": "zhipuai/glm-5.3-flash",
@@ -3093,7 +3121,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3102,7 +3130,7 @@
     {
       "id": "gpt-5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5",
       "canonical_id": "openai/gpt-5",
@@ -3184,7 +3212,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -3193,7 +3221,7 @@
     {
       "id": "gpt-5-codex",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5 Codex",
       "canonical_id": "openai/gpt-5-codex",
@@ -3274,7 +3302,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3283,7 +3311,7 @@
     {
       "id": "gpt-5-nano",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5 Nano",
       "canonical_id": "openai/gpt-5-nano",
@@ -3368,7 +3396,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -3377,7 +3405,7 @@
     {
       "id": "gpt-5.1",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.1",
       "canonical_id": "openai/gpt-5.1",
@@ -3459,7 +3487,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -3468,7 +3496,7 @@
     {
       "id": "gpt-5.1-codex",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex",
       "canonical_id": "openai/gpt-5.1-codex",
@@ -3549,7 +3577,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3558,7 +3586,7 @@
     {
       "id": "gpt-5.1-codex-max",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex Max",
       "canonical_id": "openai/gpt-5.1-codex-max",
@@ -3640,7 +3668,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3649,7 +3677,7 @@
     {
       "id": "gpt-5.1-codex-mini",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex Mini",
       "canonical_id": "openai/gpt-5.1-codex-mini",
@@ -3730,7 +3758,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3739,7 +3767,7 @@
     {
       "id": "gpt-5.2",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.2",
       "canonical_id": "openai/gpt-5.2",
@@ -3822,7 +3850,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -3831,7 +3859,7 @@
     {
       "id": "gpt-5.2-codex",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.2 Codex",
       "canonical_id": "openai/gpt-5.2-codex",
@@ -3914,7 +3942,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -3923,7 +3951,7 @@
     {
       "id": "gpt-5.3-codex",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.3 Codex",
       "canonical_id": "openai/gpt-5.3-codex",
@@ -4007,7 +4035,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -4016,7 +4044,7 @@
     {
       "id": "gpt-5.3-codex-spark",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.3 Codex Spark",
       "canonical_id": "openai/gpt-5.3-codex-spark",
@@ -4082,7 +4110,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -4091,7 +4119,7 @@
     {
       "id": "gpt-5.4",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.4",
       "canonical_id": "openai/gpt-5.4",
@@ -4199,7 +4227,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -4208,7 +4236,7 @@
     {
       "id": "gpt-5.4-mini",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.4 Mini",
       "canonical_id": "openai/gpt-5.4-mini",
@@ -4293,7 +4321,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -4302,7 +4330,7 @@
     {
       "id": "gpt-5.4-nano",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.4 Nano",
       "canonical_id": "openai/gpt-5.4-nano",
@@ -4386,7 +4414,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -4395,7 +4423,7 @@
     {
       "id": "gpt-5.4-pro",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.4 Pro",
       "canonical_id": "openai/gpt-5.4-pro",
@@ -4478,7 +4506,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -4487,7 +4515,7 @@
     {
       "id": "gpt-5.5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.5",
       "canonical_id": "openai/gpt-5.5",
@@ -4595,7 +4623,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": []
             }
           }
         }
@@ -4604,7 +4632,7 @@
     {
       "id": "gpt-5.5-pro",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.5 Pro",
       "canonical_id": "openai/gpt-5.5-pro",
@@ -4687,7 +4715,7 @@
                 "lark",
                 "regex"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -4696,7 +4724,7 @@
     {
       "id": "gpt-5.6-luna",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.6 Luna",
       "canonical_id": "openai/gpt-5.6-luna",
@@ -4816,7 +4844,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -4825,7 +4857,7 @@
     {
       "id": "gpt-5.6-sol",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.6 Sol",
       "canonical_id": "openai/gpt-5.6-sol",
@@ -4945,7 +4977,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -4954,7 +4990,7 @@
     {
       "id": "gpt-6-astra",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-6 Astra",
       "canonical_id": "openai/gpt-6-astra",
@@ -5073,7 +5109,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -5082,7 +5122,7 @@
     {
       "id": "gpt-6-sol",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-6 Sol",
       "canonical_id": "openai/gpt-6-sol",
@@ -5202,7 +5242,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -5211,7 +5255,7 @@
     {
       "id": "gpt-6.1-sol",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-6.1 Sol",
       "canonical_id": "openai/gpt-6.1-sol",
@@ -5330,7 +5374,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -5339,7 +5387,7 @@
     {
       "id": "gpt-6-luna",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-6 Luna",
       "canonical_id": "openai/gpt-6-luna",
@@ -5459,7 +5507,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -5468,7 +5520,7 @@
     {
       "id": "gpt-5.6-terra",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "GPT-5.6 Terra",
       "canonical_id": "openai/gpt-5.6-terra",
@@ -5588,7 +5640,11 @@
                 "lark",
                 "regex"
               ],
-              "updates": true
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -5597,7 +5653,7 @@
     {
       "id": "grok-4.5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Grok 4.5",
       "canonical_id": "xai/grok-4.5",
@@ -5691,7 +5747,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -5700,7 +5756,7 @@
     {
       "id": "grok-4.6",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Grok 4.6",
       "canonical_id": "xai/grok-4.6",
@@ -5796,7 +5852,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -5805,7 +5861,7 @@
     {
       "id": "grok-4.7",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Grok 4.7",
       "canonical_id": "xai/grok-4.7",
@@ -5905,7 +5961,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -5914,7 +5970,7 @@
     {
       "id": "grok-build-0.1",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Grok Build 0.1",
       "canonical_id": "xai/grok-build-0.1",
@@ -5981,7 +6037,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -5990,7 +6046,7 @@
     {
       "id": "kimi-k2.5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Kimi K2.5",
       "canonical_id": "moonshotai/kimi-k2.5",
@@ -6068,7 +6124,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6077,7 +6133,7 @@
     {
       "id": "kimi-k2.6",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Kimi K2.6",
       "canonical_id": "moonshotai/kimi-k2.6",
@@ -6160,7 +6216,7 @@
                 "auto",
                 "none"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6169,7 +6225,7 @@
     {
       "id": "kimi-k2.7-code",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Kimi K2.7 Code",
       "canonical_id": "moonshotai/kimi-k2.7-code",
@@ -6252,7 +6308,7 @@
                 "auto",
                 "none"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6261,7 +6317,7 @@
     {
       "id": "kimi-k3",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Kimi K3",
       "canonical_id": "moonshotai/kimi-k3",
@@ -6354,7 +6410,9 @@
                 "none",
                 "required"
               ],
-              "updates": true
+              "updates": [
+                "add"
+              ]
             }
           }
         }
@@ -6363,7 +6421,7 @@
     {
       "id": "minimax-m2.5",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "MiniMax-M2.5",
       "canonical_id": "minimax/MiniMax-M2.5",
@@ -6424,7 +6482,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6433,7 +6491,7 @@
     {
       "id": "minimax-m2.7",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "MiniMax-M2.7",
       "canonical_id": "minimax/MiniMax-M2.7",
@@ -6494,7 +6552,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6503,7 +6561,7 @@
     {
       "id": "minimax-m3",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "MiniMax-M3",
       "canonical_id": "minimax/MiniMax-M3",
@@ -6578,7 +6636,7 @@
               "choice": [
                 "auto"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6587,7 +6645,7 @@
     {
       "id": "muse-spark-1.2",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Muse Spark 1.2",
       "canonical_id": "meta/muse-spark-1.2",
@@ -6660,7 +6718,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6669,7 +6727,7 @@
     {
       "id": "muse-spark-1.3",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Muse Spark 1.3",
       "canonical_id": "meta/muse-spark-1.3",
@@ -6745,7 +6803,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6754,7 +6812,7 @@
     {
       "id": "muse-wonder-1.0",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Muse Wonder",
       "canonical_id": "meta/muse-wonder-1.0",
@@ -6831,7 +6889,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6840,7 +6898,7 @@
     {
       "id": "mistral-large-4",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Mistral Large 4",
       "canonical_id": "mistral/mistral-large-4",
@@ -6916,7 +6974,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -6925,7 +6983,7 @@
     {
       "id": "qwen3.5-plus",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Qwen3.5 Plus",
       "canonical_id": "alibaba/qwen3.5-plus",
@@ -7003,7 +7061,7 @@
                 "none",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7012,7 +7070,7 @@
     {
       "id": "qwen3.6-plus",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Qwen3.6 Plus",
       "canonical_id": "alibaba/qwen3.6-plus",
@@ -7097,7 +7155,7 @@
                 "none",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7106,7 +7164,7 @@
     {
       "id": "qwen3.8-flash",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Qwen3.8 Flash",
       "canonical_id": "alibaba/qwen3.8-flash",
@@ -7197,7 +7255,7 @@
                 "none",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7206,7 +7264,7 @@
     {
       "id": "qwen3.8-max",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Qwen3.8 Max",
       "canonical_id": "alibaba/qwen3.8-max",
@@ -7287,7 +7345,7 @@
                 "none",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7296,7 +7354,7 @@
     {
       "id": "longcat-2.5-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "LongCat 2.5 Free",
       "canonical_id": "meituan/longcat-2.5",
@@ -7358,7 +7416,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7367,7 +7425,7 @@
     {
       "id": "iceman-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Iceman Free",
       "type": "chat",
@@ -7419,7 +7477,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7428,7 +7486,7 @@
     {
       "id": "inkling-2-small-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Inkling 2 Small Free",
       "canonical_id": "thinkingmachines/inkling-2-small",
@@ -7498,7 +7556,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7507,7 +7565,7 @@
     {
       "id": "beam-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Beam Free",
       "canonical_id": "reflection/beam-1.0-501b-a23b",
@@ -7583,7 +7641,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7592,7 +7650,7 @@
     {
       "id": "flint-40b-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Flint 40B Free",
       "canonical_id": "recursive/flint",
@@ -7661,7 +7719,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7670,7 +7728,7 @@
     {
       "id": "nemotron-3.5-super-vl-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Nemotron 3.5 Super VL Free",
       "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
@@ -7741,7 +7799,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7750,7 +7808,7 @@
     {
       "id": "nemotron-3.5-lightning-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Nemotron 3.5 Lightning Free",
       "canonical_id": "nvidia/nemotron-3.5-lightning",
@@ -7812,7 +7870,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7821,7 +7879,7 @@
     {
       "id": "muse-ember-1.0",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Muse Ember 1.0",
       "canonical_id": "meta/muse-ember-1.0",
@@ -7918,7 +7976,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -7927,7 +7985,7 @@
     {
       "id": "claude-fable-5-2",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Claude Fable 5.2",
       "canonical_id": "anthropic/claude-fable-5-2",
@@ -8019,94 +8077,11 @@
                 "none"
               ],
               "search": true,
-              "updates": true
-            }
-          }
-        }
-      }
-    },
-    {
-      "id": "minimax-m3.1-flash-free",
-      "object": "model",
-      "created": 1794866626,
-      "owned_by": "opencode",
-      "name": "MiniMax M3.1 Flash Free",
-      "canonical_id": "minimax/MiniMax-M3.1-Flash",
-      "type": "chat",
-      "description": "Frontier multimodal coding model with 1M context window and tunable thinking depth",
-      "family": "minimax",
-      "open_weights": true,
-      "release_date": "2026-10-19",
-      "last_updated": "2026-10-19",
-      "modalities": {
-        "input": [
-          "text",
-          "image/jpeg",
-          "image/png",
-          "image/gif",
-          "image/webp",
-          "video/mp4",
-          "video/x-msvideo",
-          "video/quicktime",
-          "video/x-matroska"
-        ],
-        "output": [
-          "text"
-        ]
-      },
-      "capabilities": {
-        "tools": {
-          "supported": true
-        },
-        "reasoning": {
-          "supported": true,
-          "effort": [
-            "low",
-            "medium",
-            "high",
-            "xhigh",
-            "max"
-          ]
-        },
-        "temperature": true,
-        "top_p": true,
-        "top_k": false,
-        "system_updates": true,
-        "effort_updates": false
-      },
-      "limit": {
-        "context": 1000000,
-        "output": 512000
-      },
-      "cost": {
-        "text": {
-          "input": {
-            "price": 0,
-            "cache": {
-              "read": 0
-            }
-          },
-          "output": {
-            "price": 0
-          }
-        }
-      },
-      "api": {
-        "chat-completions": {
-          "base_url": "https://opencode.ai/inference/openai/v1",
-          "sdk": {
-            "aisdk": "@ai-sdk/openai-compatible",
-            "opencodeai": "@opencode/ai/providers/openai-compatible"
-          },
-          "compatibility": {
-            "reasoning_field": "reasoning_content"
-          },
-          "capabilities": {
-            "tools": {
-              "choice": [
-                "auto"
-              ],
-              "updates": false
+              "updates": [
+                "add",
+                "remove",
+                "replace"
+              ]
             }
           }
         }
@@ -8115,7 +8090,7 @@
     {
       "id": "gemini-4-carbon",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 4 Carbon",
       "canonical_id": "google/gemini-4-carbon",
@@ -8231,7 +8206,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -8240,7 +8215,7 @@
     {
       "id": "gemini-4-hydrogen",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Gemini 4 Hydrogen",
       "canonical_id": "google/gemini-4-hydrogen",
@@ -8351,7 +8326,7 @@
                 "required",
                 "tool"
               ],
-              "updates": false
+              "updates": []
             }
           }
         }
@@ -8360,7 +8335,7 @@
     {
       "id": "hy4-flash-free",
       "object": "model",
-      "created": 1794866626,
+      "created": 1794902164,
       "owned_by": "opencode",
       "name": "Hy4 flash Free",
       "canonical_id": "tencent/hy4-flash",
@@ -8426,7 +8401,7 @@
           },
           "capabilities": {
             "tools": {
-              "updates": false
+              "updates": []
             }
           }
         }
