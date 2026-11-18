@@ -4,7 +4,7 @@
     {
       "id": "big-pickle",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Big Pickle",
       "type": "chat",
@@ -69,12 +69,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "mimo-v2.6-flash-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "MiMo-V2.6-Flash Free",
       "canonical_id": "xiaomi/mimo-v2.6-flash",
@@ -156,12 +157,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "deepseek-v4.1-flash-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "DeepSeek V4.1 Flash Free",
       "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
@@ -243,12 +245,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "claude-fable-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Fable 5",
       "canonical_id": "anthropic/claude-fable-5",
@@ -350,12 +353,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-fable-5-1",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Fable 5.1",
       "canonical_id": "anthropic/claude-fable-5-1",
@@ -455,12 +459,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-haiku-4-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Haiku 4.5",
       "canonical_id": "anthropic/claude-haiku-4-5",
@@ -554,12 +559,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-haiku-5-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Haiku 5.5",
       "canonical_id": "anthropic/claude-haiku-5-5",
@@ -687,12 +693,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-opus-4-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Opus 4.5",
       "canonical_id": "anthropic/claude-opus-4-5",
@@ -791,12 +798,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-opus-4-6",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Opus 4.6",
       "canonical_id": "anthropic/claude-opus-4-6",
@@ -896,12 +904,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-opus-4-7",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Opus 4.7",
       "canonical_id": "anthropic/claude-opus-4-7",
@@ -999,12 +1008,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-opus-4-8",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Opus 4.8",
       "canonical_id": "anthropic/claude-opus-4-8",
@@ -1106,12 +1116,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-opus-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Opus 5",
       "canonical_id": "anthropic/claude-opus-5",
@@ -1213,12 +1224,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-opus-5-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Opus 5.5",
       "canonical_id": "anthropic/claude-opus-5-5",
@@ -1318,12 +1330,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-sonnet-4-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Sonnet 4.5",
       "canonical_id": "anthropic/claude-sonnet-4-5",
@@ -1441,12 +1454,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-sonnet-4-6",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Sonnet 4.6",
       "canonical_id": "anthropic/claude-sonnet-4-6",
@@ -1546,12 +1560,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-sonnet-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Sonnet 5",
       "canonical_id": "anthropic/claude-sonnet-5",
@@ -1649,12 +1664,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "claude-sonnet-5-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Sonnet 5.5",
       "canonical_id": "anthropic/claude-sonnet-5-5",
@@ -1754,12 +1770,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "deepseek-v4.1-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "DeepSeek V4.1 Flash 1017",
       "canonical_id": "deepseek/deepseek-v4.1-flash-1017",
@@ -1844,12 +1861,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "deepseek-v4-pro",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "DeepSeek V4 Pro",
       "canonical_id": "deepseek/deepseek-v4-pro",
@@ -1929,12 +1947,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "gemini-3.5-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 3.5 Flash",
       "canonical_id": "google/gemini-3.5-flash",
@@ -2042,12 +2061,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "gemini-3.5-flash-lite",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 3.5 Flash Lite",
       "canonical_id": "google/gemini-3.5-flash-lite",
@@ -2153,12 +2173,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "gemini-3.6-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 3.6 Flash",
       "canonical_id": "google/gemini-3.6-flash",
@@ -2276,12 +2297,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "gemini-3.7-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 3.7 Flash",
       "canonical_id": "google/gemini-3.7-flash",
@@ -2398,12 +2420,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "gemini-3.8-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 3.8 Flash",
       "canonical_id": "google/gemini-3.8-flash",
@@ -2522,12 +2545,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "gemini-4-argon",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 4 Argon",
       "canonical_id": "google/gemini-4-argon",
@@ -2647,12 +2671,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "glm-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GLM-5",
       "canonical_id": "zhipuai/glm-5",
@@ -2724,12 +2749,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "glm-5.1",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GLM-5.1",
       "canonical_id": "zhipuai/glm-5.1",
@@ -2798,12 +2824,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "glm-5.2",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GLM-5.2",
       "canonical_id": "zhipuai/glm-5.2",
@@ -2875,12 +2902,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "glm-5.3",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GLM-5.3",
       "canonical_id": "zhipuai/glm-5.3",
@@ -2956,12 +2984,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "glm-5.3-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GLM-5.3-Flash",
       "canonical_id": "zhipuai/glm-5.3-flash",
@@ -3042,12 +3071,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "gpt-5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5",
       "canonical_id": "openai/gpt-5",
@@ -3133,12 +3163,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5-codex",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5 Codex",
       "canonical_id": "openai/gpt-5-codex",
@@ -3223,12 +3254,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5-nano",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5 Nano",
       "canonical_id": "openai/gpt-5-nano",
@@ -3317,12 +3349,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.1",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.1",
       "canonical_id": "openai/gpt-5.1",
@@ -3408,12 +3441,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.1-codex",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex",
       "canonical_id": "openai/gpt-5.1-codex",
@@ -3498,12 +3532,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.1-codex-max",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex Max",
       "canonical_id": "openai/gpt-5.1-codex-max",
@@ -3589,12 +3624,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.1-codex-mini",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.1 Codex Mini",
       "canonical_id": "openai/gpt-5.1-codex-mini",
@@ -3679,12 +3715,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.2",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.2",
       "canonical_id": "openai/gpt-5.2",
@@ -3771,12 +3808,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.2-codex",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.2 Codex",
       "canonical_id": "openai/gpt-5.2-codex",
@@ -3863,12 +3901,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.3-codex",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.3 Codex",
       "canonical_id": "openai/gpt-5.3-codex",
@@ -3956,12 +3995,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.3-codex-spark",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.3 Codex Spark",
       "canonical_id": "openai/gpt-5.3-codex-spark",
@@ -4031,12 +4071,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.4",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.4",
       "canonical_id": "openai/gpt-5.4",
@@ -4148,12 +4189,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.4-mini",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.4 Mini",
       "canonical_id": "openai/gpt-5.4-mini",
@@ -4242,12 +4284,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.4-nano",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.4 Nano",
       "canonical_id": "openai/gpt-5.4-nano",
@@ -4335,12 +4378,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.4-pro",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.4 Pro",
       "canonical_id": "openai/gpt-5.4-pro",
@@ -4427,12 +4471,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.5",
       "canonical_id": "openai/gpt-5.5",
@@ -4544,12 +4589,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.5-pro",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.5 Pro",
       "canonical_id": "openai/gpt-5.5-pro",
@@ -4636,12 +4682,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.6-luna",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.6 Luna",
       "canonical_id": "openai/gpt-5.6-luna",
@@ -4769,12 +4816,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.6-sol",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.6 Sol",
       "canonical_id": "openai/gpt-5.6-sol",
@@ -4902,12 +4950,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-6-astra",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-6 Astra",
       "canonical_id": "openai/gpt-6-astra",
@@ -5034,12 +5083,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-6-sol",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-6 Sol",
       "canonical_id": "openai/gpt-6-sol",
@@ -5167,12 +5217,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-6.1-sol",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-6.1 Sol",
       "canonical_id": "openai/gpt-6.1-sol",
@@ -5299,12 +5350,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-6-luna",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-6 Luna",
       "canonical_id": "openai/gpt-6-luna",
@@ -5432,12 +5484,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-5.6-terra",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-5.6 Terra",
       "canonical_id": "openai/gpt-5.6-terra",
@@ -5565,12 +5618,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "grok-4.5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Grok 4.5",
       "canonical_id": "xai/grok-4.5",
@@ -5668,12 +5722,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "grok-4.6",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Grok 4.6",
       "canonical_id": "xai/grok-4.6",
@@ -5773,12 +5828,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "grok-4.7",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Grok 4.7",
       "canonical_id": "xai/grok-4.7",
@@ -5882,12 +5938,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "grok-build-0.1",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Grok Build 0.1",
       "canonical_id": "xai/grok-build-0.1",
@@ -5958,12 +6015,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "kimi-k2.5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Kimi K2.5",
       "canonical_id": "moonshotai/kimi-k2.5",
@@ -6045,12 +6103,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "kimi-k2.6",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Kimi K2.6",
       "canonical_id": "moonshotai/kimi-k2.6",
@@ -6137,12 +6196,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "kimi-k2.7-code",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Kimi K2.7 Code",
       "canonical_id": "moonshotai/kimi-k2.7-code",
@@ -6229,12 +6289,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "kimi-k3",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Kimi K3",
       "canonical_id": "moonshotai/kimi-k3",
@@ -6333,12 +6394,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "minimax-m2.5",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "MiniMax-M2.5",
       "canonical_id": "minimax/MiniMax-M2.5",
@@ -6403,12 +6465,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "minimax-m2.7",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "MiniMax-M2.7",
       "canonical_id": "minimax/MiniMax-M2.7",
@@ -6473,12 +6536,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "minimax-m3",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "MiniMax-M3",
       "canonical_id": "minimax/MiniMax-M3",
@@ -6557,12 +6621,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "muse-spark-1.2",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Muse Spark 1.2",
       "canonical_id": "meta/muse-spark-1.2",
@@ -6639,12 +6704,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "muse-spark-1.3",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Muse Spark 1.3",
       "canonical_id": "meta/muse-spark-1.3",
@@ -6724,12 +6790,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "muse-wonder-1.0",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Muse Wonder",
       "canonical_id": "meta/muse-wonder-1.0",
@@ -6810,12 +6877,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "mistral-large-4",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Mistral Large 4",
       "canonical_id": "mistral/mistral-large-4",
@@ -6895,12 +6963,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "qwen3.5-plus",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Qwen3.5 Plus",
       "canonical_id": "alibaba/qwen3.5-plus",
@@ -6982,12 +7051,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "qwen3.6-plus",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Qwen3.6 Plus",
       "canonical_id": "alibaba/qwen3.6-plus",
@@ -7076,12 +7146,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "qwen3.8-flash",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Qwen3.8 Flash",
       "canonical_id": "alibaba/qwen3.8-flash",
@@ -7176,12 +7247,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "qwen3.8-max",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Qwen3.8 Max",
       "canonical_id": "alibaba/qwen3.8-max",
@@ -7266,12 +7338,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "longcat-2.5-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "LongCat 2.5 Free",
       "canonical_id": "meituan/longcat-2.5",
@@ -7337,12 +7410,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "iceman-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Iceman Free",
       "type": "chat",
@@ -7398,12 +7472,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "inkling-2-small-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Inkling 2 Small Free",
       "canonical_id": "thinkingmachines/inkling-2-small",
@@ -7477,12 +7552,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "beam-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Beam Free",
       "canonical_id": "reflection/beam-1.0-501b-a23b",
@@ -7562,12 +7638,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "flint-40b-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Flint 40B Free",
       "canonical_id": "recursive/flint",
@@ -7640,12 +7717,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "nemotron-3.5-super-vl-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Nemotron 3.5 Super VL Free",
       "canonical_id": "nvidia/nemotron-3.5-super-vl-120b-a12b",
@@ -7720,12 +7798,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "nemotron-3.5-lightning-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Nemotron 3.5 Lightning Free",
       "canonical_id": "nvidia/nemotron-3.5-lightning",
@@ -7791,12 +7870,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "muse-ember-1.0",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Muse Ember 1.0",
       "canonical_id": "meta/muse-ember-1.0",
@@ -7897,12 +7977,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "claude-fable-5-2",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Claude Fable 5.2",
       "canonical_id": "anthropic/claude-fable-5-2",
@@ -8002,12 +8083,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "messages"
     },
     {
       "id": "gemini-4-carbon",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 4 Carbon",
       "canonical_id": "google/gemini-4-carbon",
@@ -8127,12 +8209,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "gemini-4-hydrogen",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Gemini 4 Hydrogen",
       "canonical_id": "google/gemini-4-hydrogen",
@@ -8247,12 +8330,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "generate-content"
     },
     {
       "id": "hy4-flash-free",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "Hy4 flash Free",
       "canonical_id": "tencent/hy4-flash",
@@ -8322,12 +8406,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "chat-completions"
     },
     {
       "id": "gpt-6.2-sol",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-6.2 Sol",
       "canonical_id": "openai/gpt-6.2-sol",
@@ -8454,12 +8539,13 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     },
     {
       "id": "gpt-6.2-astra",
       "object": "model",
-      "created": 1794986994,
+      "created": 1795033946,
       "owned_by": "opencode",
       "name": "GPT-6.2 Astra",
       "canonical_id": "openai/gpt-6.2-astra",
@@ -8586,7 +8672,8 @@
             }
           }
         }
-      }
+      },
+      "recommended_api": "responses"
     }
   ]
 }
