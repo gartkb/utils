@@ -39,6 +39,8 @@ th.sorted-asc::after{content:" ▲";font-size:9px;color:var(--accent)}
 th.sorted-desc::after{content:" ▼";font-size:9px;color:var(--accent)}
 td{padding:6px 4px;border-bottom:1px solid #222631;vertical-align:top}
 tr:hover td{background:#1e222b}
+tr.unranked td{opacity:0.8}
+tr.unranked .rank{color:var(--muted)}
 .rank{font-weight:700;width:28px}
 .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px}
 .pill{font-size:10px;padding:2px 5px;border-radius:999px;background:#222631;border:1px solid var(--border);color:var(--muted)}
@@ -78,8 +80,9 @@ a:hover{text-decoration:underline}
 <div id="log">Ready. Local-first: reading synced JSON files (updated hourly via Action).</div>
 <main>
   <div class="card" id="leftCard">
-    <h2>Free Models — by AA Intelligence</h2>
-    <div class="sub">Universe: OR free (<code>prompt==0 && completion==0</code>, tools shown as badge) + OpenCode free (picker status), merged by AA model. <span id="leftMeta" class="small"></span></div>
+    <h2>Free Models — by AA Intelligence (rated + unrated)</h2>
+    <div class="sub">Universe: OR free (<code>prompt==0 && completion==0</code>, tools shown as badge) + OpenCode free (picker status), merged by AA model. Models with no AA score (N/A) are listed after the ranked rows. <span id="leftMeta" class="small"></span></div>
+    <div class="small" style="margin-bottom:8px"><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" id="showUnrated" checked> include free models with no AA score (N/A)</label></div>
     <div id="leftBody">Loading…</div>
     <div id="leftFoot" class="small" style="margin-top:8px"></div>
     <div class="small" style="margin-top:6px"><button id="unratedBtn" class="link-btn" style="display:none"></button></div>
@@ -395,6 +398,7 @@ let currentLeft=[], currentRight=[], currentAA=[], currentFreeSet=new Set();
 let currentUnbench=[];
 let rightThresh=40, rightMode="value";
 let allAACandidates=[];
+let showUnrated=true, lastLeftArgs=null;
 
 function sortTable(tableId, colIdx, dir){
   const tbody=document.querySelector(`#${tableId} tbody`);
@@ -409,7 +413,7 @@ function sortTable(tableId, colIdx, dir){
     return dir==="asc"?cmp:-cmp;
   });
   rows.forEach(r=>tbody.appendChild(r));
-  rows.forEach((r,i)=>{ r.children[0].textContent=i+1; });
+  rows.forEach((r,i)=>{ const c=r.children[0]; if(c && !c.dataset.unranked) c.textContent=i+1; });
 }
 
 function makeSortable(tableId){
@@ -439,6 +443,7 @@ function computeFrontier(candidates){
 }
 
 function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
+  lastLeftArgs={orFree, opModels, aaBySlug, uptimeMap};
   const ctxMap={
     "muse-spark-1.3-contributor-free":1048576,
     "muse-spark-1.2-contributor-free":1048576,
@@ -479,22 +484,39 @@ function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
   });
 
   // Merge by AA slug so a model free on several providers is one row listing all of them.
-  const groups=new Map(), unbench=[];
+  // Listings with no AA score are grouped the same way and appended after the ranked rows.
+  const groups=new Map(), unratedListings=[];
   for(const r of rows){
-    if(r.intel==null){ unbench.push(r); continue; }
+    if(r.intel==null){ unratedListings.push(r); continue; }
     const g=groups.get(r.aaSlug);
     if(g) g.rows.push(r); else groups.set(r.aaSlug,{aaSlug:r.aaSlug, intel:r.intel, code:r.code, rows:[r]});
   }
-  const merged=[...groups.values()].sort((a,b)=>b.intel-a.intel);
+  const rated=[...groups.values()].sort((a,b)=>b.intel-a.intel);
+
+  const unGroups=new Map();
+  for(const r of unratedListings){
+    const k = r.aaSlug || ("id:"+r.id);
+    const g=unGroups.get(k);
+    if(g) g.rows.push(r); else unGroups.set(k,{aaSlug:r.aaSlug, intel:null, code:null, rows:[r]});
+  }
+  const unrated=[...unGroups.values()].sort((a,b)=>String(a.rows[0].id).localeCompare(String(b.rows[0].id)));
+
+  const merged = showUnrated ? rated.concat(unrated) : rated;
   currentLeft = merged;
   currentFreeSet = new Set(rows.map(r=>r.aaSlug).filter(Boolean));
 
   let html='<table id="leftTable"><thead><tr><th>#</th><th>Model</th><th>AA Intel</th><th>Coding</th><th>Ctx</th><th>Uptime 1d</th><th>Free on</th></tr></thead><tbody>';
   merged.forEach((g,i)=>{
+    const unranked = g.intel==null;
     const ctx = Math.max(...g.rows.map(r=>r.ctx||0));
     const ctxK = ctx ? Math.round(ctx/1024)+"K" : "—";
     const up = (g.rows.find(r=>r.uptime)||{}).uptime?.u1d ?? null;
     const ids = g.rows.map(r=>r.id).join(" · ");
+    const aaName = g.aaSlug || g.rows[0].id;
+    const aaCell = g.aaSlug
+      ? `<a href="https://artificialanalysis.ai/models/${escHtml(g.aaSlug)}" target="_blank">${escHtml(g.aaSlug)}</a>`
+      : escHtml(aaName);
+    const unratedPill = unranked ? ` <span class="pill" title="Artificial Analysis has no intelligence score for this model yet">no AA score</span>` : "";
     const prov = g.rows.map(r=>{
       if(r.src==="opencode"){
         const b = r.picker==="picker" ? ` <span class="pill free" title="In /models picker (keyless IP-limited, higher quota with Zen login)">✅ picker</span>` : "";
@@ -503,28 +525,34 @@ function renderLeft(orFree, opModels, aaBySlug, uptimeMap){
       const nt = r.noTools ? ` <span class="pill" title="OpenRouter does not list tool support for this model">no tools</span>` : "";
       return `<span class="pill">OpenRouter</span>${nt}`;
     }).join(" ");
-    html+=`<tr><td class="rank">${i+1}</td><td class="mono"><a href="https://artificialanalysis.ai/models/${g.aaSlug}" target="_blank">${g.aaSlug}</a><div class="small">${ids}</div></td><td data-sort="${g.intel}">${fmtIntel(g.intel)}</td><td data-sort="${g.code??-1}">${g.code!=null?Number(g.code).toFixed(1):"N/A"}</td><td data-sort="${ctx}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
+    html+=`<tr${unranked?' class="unranked"':''}><td class="rank"${unranked?' data-unranked="1"':''}>${unranked?"—":i+1}</td><td class="mono">${aaCell}${unratedPill}<div class="small">${ids}</div></td><td data-sort="${unranked?-1:g.intel}">${fmtIntel(g.intel)}</td><td data-sort="${g.code??-1}">${g.code!=null?Number(g.code).toFixed(1):"N/A"}</td><td data-sort="${ctx}">${ctxK}</td><td data-sort="${up??-1}">${uptimeBadge(up)}</td><td>${prov}</td></tr>`;
   });
   html+='</tbody></table>';
   el('leftBody').innerHTML=html;
   makeSortable('leftTable');
 
-  currentUnbench = [...unbench].sort((a,b)=> String(a.id).localeCompare(String(b.id)));
+  currentUnbench = [...unratedListings].sort((a,b)=> String(a.id).localeCompare(String(b.id)));
 
-  if(currentUnbench.length){
-    const preview = currentUnbench.slice(0,4).map(r=>`<code>${r.id}</code>`).join(" · ");
-    const more = currentUnbench.length>4 ? ` +${currentUnbench.length-4} more` : "";
-    el('leftFoot').innerHTML = `No AA benchmark (N/A): ${preview}${more}`;
-    const btn = el('unratedBtn');
+  const nUn = currentUnbench.length;
+  const btn = el('unratedBtn');
+  if(nUn){
+    if(showUnrated){
+      el('leftFoot').innerHTML = `${nUn} free listing${nUn===1?"":"s"} (${unrated.length} model${unrated.length===1?"":"s"}) ha${nUn===1?"s":"ve"} no AA score (N/A) — listed after the ranked rows.`;
+      btn.textContent = `Details for the ${nUn} unrated free listing${nUn===1?"":"s"}`;
+    } else {
+      const preview = currentUnbench.slice(0,4).map(r=>`<code>${escHtml(r.id)}</code>`).join(" · ");
+      const more = nUn>4 ? ` +${nUn-4} more` : "";
+      el('leftFoot').innerHTML = `Hidden — ${nUn} unrated free listing${nUn===1?"":"s"}: ${preview}${more}`;
+      btn.textContent = `Show details for all ${nUn} unrated free models`;
+    }
     btn.style.display = "";
-    btn.textContent = `Show all ${currentUnbench.length} unrated free models`;
     btn.onclick = openUnratedModal;
   } else {
     el('leftFoot').innerHTML = "";
-    el('unratedBtn').style.display = "none";
+    btn.style.display = "none";
   }
   const stAge = (pickerStatus && pickerStatus.updated_utc) ? ` · picker status ${pickerStatus.updated_utc}` : "";
-  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${merged.length} benchmarked free models (${rows.length} listings)${stAge}`;
+  el('leftMeta').innerHTML = `— ${getDataAgeBadge()} · ${rated.length} scored${showUnrated&&unrated.length?` + ${unrated.length} unrated`:""} free models (${rows.length} listings)${stAge}`;
 }
 
 function escHtml(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
@@ -682,7 +710,7 @@ function drawScatter(){
     ctx.beginPath(); ctx.arc(x,y,2.4,0,Math.PI*2); ctx.fill();
   }
 
-  // Free Top 10 highlights (Blue)
+  // Free models highlights (Blue)
   const leftSlugs=new Set(currentLeft.map(r=>r.aaSlug).filter(Boolean));
   for(const p of pts){
     if(leftSlugs.has(p.slug)){
@@ -770,6 +798,13 @@ async function buildAll(force=false){
 }
 
 // Controls wiring
+el('showUnrated').addEventListener('change', (e)=>{
+  showUnrated=e.target.checked;
+  if(lastLeftArgs){
+    renderLeft(lastLeftArgs.orFree, lastLeftArgs.opModels, lastLeftArgs.aaBySlug, lastLeftArgs.uptimeMap);
+    if(currentAA.length) drawScatter();
+  }
+});
 el('intelThresh').addEventListener('input', (e)=>{
   rightThresh=Number(e.target.value);
   el('threshVal').textContent=String(rightThresh);
